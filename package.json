@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "build": "web-ext --config=web-ext.config.js build"
+  },
+  "devDependencies": {
+    "web-ext": "^6.8.0"
+  }
+}

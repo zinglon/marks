@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="styles.css"/>
+  </head>
+  <body>
+    <div id="header">
+      <h1>Bookmarks</h1>
+    </div>
+    <div id="content">
+      <!-- <label for="search">Search</label> -->
+      <input id="search" placeholder="Search"></input>
+      <nav>
+        <ul id="bookmark-list">
+        </ul>
+      </nav>
+    </div>
+  </body>
+  <script type="module" src="scripts.js"></script>
+  <template id="bookmark-template">
+    <li>
+      <a>
+        <div class="container">
+          <h2></h2>
+          <p></p>
+        </div>
+      </a>
+    </li>
+  </template>
+</html>
