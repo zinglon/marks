@@ -50,13 +50,20 @@ const createSearchHandler = (searchHandler) =>
 
 // TODO: pass data in as param
 // TODO: make handle search a param or something
-document.querySelector(".input-container button").addEventListener('click', (e) => {
+document.querySelector(".input-container .filter").addEventListener('click', (e) => {
   const isFiltering = e.target.value === "true";
   e.target.value = !isFiltering;
   data.bookmarks.setFilterFavorites(!isFiltering);
   handleSearch(getSearchInput().value);
 });
-document.querySelector(".input-container button").value = data.bookmarks.getFilterFavorites()
+document.querySelector(".input-container .filter").value = data.bookmarks.getFilterFavorites();
+
+document.querySelector("button.sort").addEventListener('click', (e) => {
+  const isSorting = e.target.value === "asc";
+  e.target.value = isSorting ? "desc" : "asc";
+  data.bookmarks.setSortingAsc(!isSorting);
+  handleSearch(getSearchInput().value);
+})
 
 export const bookmarks = { addBookmarkOption, showNoResults, clearBookmarkList, createSearchHandler };
 

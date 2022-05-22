@@ -6,6 +6,7 @@ const setFilterFavorites = (filter) => (filterFavorites = filter);
 const getFilterFavorites = () => filterFavorites;
 
 let isSortingAsc = true;
+const setSortingAsc = (asc) => (isSortingAsc = asc);
 
 const getBookmarks = async (search) => {
   const isBookmark = (bookmark) => bookmark.type === 'bookmark'
@@ -37,7 +38,7 @@ const removeFavorite = (bookmarkId) => {
 const isFavorite = (bookmarkId) => getFavorites().some(id => id === bookmarkId);
 const setFavorites = (favorites) => localStorage.setItem(favoritesKey, JSON.stringify(favorites));
 
-export const bookmarks = { getBookmarks, getFavorites, addFavorite, removeFavorite, isFavorite, setFilterFavorites, getFilterFavorites };
+export const bookmarks = { getBookmarks, getFavorites, addFavorite, removeFavorite, isFavorite, setFilterFavorites, getFilterFavorites, setSortingAsc };
 
 /**
  * Theme

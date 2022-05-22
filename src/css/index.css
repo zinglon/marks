@@ -170,16 +170,27 @@ nav {
 .input-container button {
   background: var(--banner-input-background-color);
   margin: 12px 0px 12px 4px;
-  border-radius: 0px 6px 6px 0px;
   padding: 12px;
   color: var(--banner-text-color);
 }
 
-.input-container button[value=true]:before {
+.input-container button.filter {
+  border-radius: 0px 6px 6px 0px;
+}
+
+.input-container button.sort[value=asc]:before {
+  content: "AZ↓"
+}
+
+.input-container button.sort[value=desc]:before {
+  content: "AZ↑"
+}
+
+.input-container button.filter[value=true]:before {
   content: "★"
 }
 
-.input-container button[value=false]:before {
+.input-container button.filter[value=false]:before {
   content: "☆"
 }
 
