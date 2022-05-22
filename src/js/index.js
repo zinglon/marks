@@ -15,4 +15,6 @@ export const handleSearch = async (searchTerm) => {
 
 populateBookmarkList();
 ui.bookmarks.createSearchHandler(handleSearch);
+ui.bookmarks.createSortHandler();
+ui.bookmarks.createFilterHandler();
 ui.theme.createThemeHandler(data.theme);
