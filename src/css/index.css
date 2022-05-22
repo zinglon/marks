@@ -134,6 +134,8 @@ a {
   text-decoration: none;
   color: var(--list-title-color);
   flex: 1;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .container {
