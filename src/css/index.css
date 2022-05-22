@@ -1,0 +1,185 @@
+:root {
+  --control-color: #eee;
+  
+  --banner-background-color: #175ddc;
+  --banner-text-color: white;
+
+  --banner-input-background-color: #0f4cbb;
+
+  --list-background-color: white;
+  --list-title-color: rgb(40, 40, 40);
+  --list-subtitle-color: rgb(155, 155, 155);
+  --list-accent-color: gainsboro;
+  --list-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+
+  --footer-background-color: #eee;
+}
+
+[data-theme="dark"] {
+  --control-color: #eee;
+
+  --banner-background-color: rgb(33, 33, 33);
+  --banner-text-color: white;
+
+  --banner-input-background-color: #555;
+
+  --list-background-color: #555;
+  --list-title-color: #eee;
+  --list-subtitle-color: gainsboro;
+  --list-accent-color: #333;
+  --list-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+
+  --footer-background-color: #333;
+}
+
+body {
+  height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 400px 1fr;
+  grid-template-rows: minmax(auto, auto) 1fr 1fr 1fr;
+  grid-template-areas:
+    "controls controls controls"
+    "header header header"
+    ". search ."
+    ". search ."
+  ;
+  font-family: sans-serif;
+  background-color: var(--footer-background-color);
+}
+
+button, a {
+  cursor: pointer;
+}
+
+.controls {
+  grid-area: controls;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: var(--banner-background-color);
+  color: var(--control-color)
+}
+
+button {
+  margin: 8px;
+  background: none;
+  border: none;
+}
+
+li button {
+  color: var(--list-title-color);
+}
+
+.controls > * {
+  color: var(--banner-text-color);
+}
+
+[data-theme="light"] .controls > button[value=light] {
+  display: none;
+}
+
+[data-theme="dark"] .controls > button[value=dark] {
+  display: none;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+#content {
+  grid-area: search;
+  display: flex;
+  flex-direction: column;
+}
+
+#search {
+  background: var(--banner-input-background-color);
+  color: var(--banner-text-color);
+  border: none;
+  padding: 12px;
+  border-radius: 6px 0px 0px 6px;
+  margin: 12px 0px;
+  font-size: 1em;
+}
+
+nav {
+  overflow: auto;
+  max-height: 100%;
+  background-color: var(--list-background-color);
+}
+
+#header {
+  grid-area: header;
+}
+
+h1 {
+  display: flex;
+  height: 100%;
+  padding-bottom: 96px;
+  justify-content: center;
+  align-items: flex-end;
+  font-weight: semi-bold;
+  background: var(--banner-background-color);
+  color: var(--banner-text-color);
+}
+
+li {
+  background-color: var(--list-background-color);
+  border-bottom: 1px var(--list-accent-color) solid;
+  display: flex;
+}
+
+a {
+  text-decoration: none;
+  color: var(--list-title-color);
+  flex: 1;
+}
+
+.container {
+  padding: 8px;
+}
+
+p, h1, h2, body, ul {
+  margin: 0px;
+}
+
+p {
+  color: var(--list-subtitle-color);
+  font-size: 1em;
+}
+
+h2 {
+  font-size: 1em;
+  font-weight: normal;
+  color: var(--list-title-color)
+}
+
+nav {
+  box-shadow: var(--list-shadow);
+}
+
+.input-container {
+  display: flex;
+}
+
+.input-container input {
+  flex: 1;
+}
+
+.input-container button {
+  background: var(--banner-input-background-color);
+  margin: 12px 0px 12px 4px;
+  border-radius: 0px 6px 6px 0px;
+  padding: 12px;
+  color: var(--banner-text-color);
+}
+
+.input-container button[value=true]:before {
+  content: "★"
+}
+
+.input-container button[value=false]:before {
+  content: "☆"
+}
+
