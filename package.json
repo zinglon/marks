@@ -3,6 +3,11 @@
     "build": "web-ext --config=web-ext.config.js build"
   },
   "devDependencies": {
+    "eslint": "^8.11.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.2.0",
+    "eslint-plugin-promise": "^6.0.0",
     "web-ext": "^6.8.0"
   }
 }
