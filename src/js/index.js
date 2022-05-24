@@ -18,3 +18,7 @@ ui.bookmarks.createSearchHandler(handleSearch);
 ui.bookmarks.createSortHandler();
 ui.bookmarks.createFilterHandler();
 ui.theme.createThemeHandler(data.theme);
+
+// todo: add alt text to images
+// todo: clean up css
+// todo: research after favorite/unfavorite

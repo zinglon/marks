@@ -6,6 +6,8 @@ import { handleSearch } from "../js/index.js";
 const getBookmarksList = () => document.querySelector("#bookmark-list");
 const getSearchInput = () => document.querySelector("#search");
 const getBookmarkTemplate = () => document.querySelector("#bookmark-template");
+const getSearchInputContainer = () => document.querySelector(".input-container");
+const getBookmarkDetail = () => document.querySelector(".edit-container");
 
 const addBookmarkOption = (bookmark) => {
   const bookmarkOption = getBookmarkTemplate().content.cloneNode(true);
@@ -19,15 +21,15 @@ const addBookmarkOption = (bookmark) => {
   const url = bookmarkOption.querySelector("p");
   url.textContent = bookmark.url;
 
-  const button = bookmarkOption.querySelector("button");
+  const favoriteButton = bookmarkOption.querySelector(".favorite");
 
   if (bookmark.id) {
-    button.value = bookmark.id;
+    favoriteButton.value = bookmark.id;
     const updateButtonText = (isFavorite) => {
-      button.textContent = isFavorite ? "★" : "☆";
+      favoriteButton.textContent = isFavorite ? "★" : "☆";
     }
     updateButtonText(data.bookmarks.isFavorite(bookmark.id));
-    button.addEventListener('click', (e) => {
+    favoriteButton.addEventListener('click', (e) => {
       // TODO: pass data in as param
       if(data.bookmarks.isFavorite(e.target.value)) {
         data.bookmarks.removeFavorite(e.target.value)
@@ -36,10 +38,22 @@ const addBookmarkOption = (bookmark) => {
       }
       updateButtonText(data.bookmarks.isFavorite(e.target.value));
     });
+
+    const editButton = bookmarkOption.querySelector(".edit");
+    editButton.addEventListener('click', hideShowEdit);
   }
 
   getBookmarksList().appendChild(bookmarkOption);
 }
+
+const hideShowEdit = () => {
+  getSearchInputContainer().classList.toggle("hidden");
+  getBookmarksList().classList.toggle("hidden");
+  getBookmarkDetail().classList.toggle("hidden");
+}
+
+document.querySelector(".new").addEventListener('click', hideShowEdit);
+document.querySelector(".cancel").addEventListener('click', hideShowEdit);
 
 const showNoResults = () => addBookmarkOption({ title: "No results"})
 

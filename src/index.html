@@ -13,11 +13,17 @@
       <h1>'marks</h1>
     </div>
     <div id="content">
-      <label aria-label="Search" for="search"></label>
       <div class="input-container">
+        <label aria-label="Search" for="search"></label>
         <input id="search" placeholder="Search"></input>
         <button class="sort" type="button" value="asc"></button>
         <button class="filter" type="button" value="false"></button>
+        <button class="new" type="button">+</button>
+      </div>
+      <div class="edit-container hidden">
+        <input id="title" placeholder="Title"></input>
+        <input id="url" placeholder="URL"></input>
+        <button class="cancel" type="button">Cancel</button>
       </div>
       <nav>
         <ul id="bookmark-list">
@@ -34,7 +40,8 @@
           <p></p>
         </div>
       </a>
-      <button type="button"></button>
+      <button class="favorite" type="button"></button>
+      <button class="edit" type="button">✎</button>
     </li>
   </template>
 </html>
