@@ -1,45 +1,54 @@
 import * as data from '../data/index.js'
 import { handleSearch } from './index.js'
+import { unwrapValue, getElement } from '../lib/helpers.js'
+
+enum FavoriteStatus {
+  Favorite = '★',
+  NotFavorite = '☆'
+}
+
 /**
  * Bookmarks
  */
-const getBookmarksList = () => document.querySelector('#bookmark-list') as any
-const getSearchInput = () => document.querySelector('#search') as any
-const getBookmarkTemplate = () => document.querySelector('#bookmark-template') as any // TODO
-const getSearchInputContainer = () => document.querySelector('.input-container') as Element
-const getBookmarkDetail = () => document.querySelector('.edit-container') as Element
+const getBookmarksList = () => getElement<HTMLUListElement>(document, '#bookmark-list')
+const getSearchInput = () => getElement<HTMLInputElement>(document, '#search')
+const getBookmarkTemplate = () => getElement<HTMLTemplateElement>(document, '#bookmark-template')
+const getSearchInputContainer = () => getElement(document, '.input-container')
+const getBookmarkDetail = () => getElement(document, '.edit-container')
+const getCreateBookmark = () => getElement(document, '.new')
+const getCancelCreateBookmark = () => getElement(document, '.cancel')
 
-const addBookmarkOption = (bookmark: any) => {
-  const bookmarkOption = getBookmarkTemplate().content.cloneNode(true)
+const addBookmarkOption = (bookmark: browser.bookmarks.BookmarkTreeNode) => {
+  const bookmarkOption = getBookmarkTemplate().content.cloneNode(true) as HTMLElement
 
-  const link = bookmarkOption.querySelector('a')
-  link.href = bookmark.url
+  const link = getElement<HTMLAnchorElement>(bookmarkOption, 'a')
+  link.href = bookmark.url ?? ''
 
-  const title = bookmarkOption.querySelector('h2')
+  const title = getElement<HTMLHeadingElement>(bookmarkOption, 'h2')
   title.textContent = bookmark.title
 
-  const url = bookmarkOption.querySelector('p')
-  url.textContent = bookmark.url
+  const url = getElement<HTMLParagraphElement>(bookmarkOption, 'p')
+  url.textContent = bookmark.url ?? ''
 
-  const favoriteButton = bookmarkOption.querySelector('.favorite')
+  const favoriteButton = getElement<HTMLButtonElement>(bookmarkOption, '.favorite')
 
   if (bookmark.id) {
     favoriteButton.value = bookmark.id
     const updateButtonText = (isFavorite: boolean) => {
-      favoriteButton.textContent = isFavorite ? '★' : '☆'
+      favoriteButton.textContent = isFavorite ? FavoriteStatus.Favorite : FavoriteStatus.NotFavorite
     }
     updateButtonText(data.bookmarks.isFavorite(bookmark.id))
-    favoriteButton.addEventListener('click', (e: any) => {
+    favoriteButton.addEventListener('click', (e) => {
       // TODO: pass data in as param
-      if (data.bookmarks.isFavorite(e.target.value)) {
-        data.bookmarks.removeFavorite(e.target.value)
+      if (data.bookmarks.isFavorite(unwrapValue(e))) {
+        data.bookmarks.removeFavorite(unwrapValue(e))
       } else {
-        data.bookmarks.addFavorite(e.target.value)
+        data.bookmarks.addFavorite(unwrapValue(e))
       }
-      updateButtonText(data.bookmarks.isFavorite(e.target.value))
+      updateButtonText(data.bookmarks.isFavorite(unwrapValue(e)))
     })
 
-    const editButton = bookmarkOption.querySelector('.edit')
+    const editButton = bookmarkOption.querySelector('.edit')!
     editButton.addEventListener('click', hideShowEdit)
   }
 
@@ -52,22 +61,24 @@ const hideShowEdit = () => {
   getBookmarkDetail().classList.toggle('hidden')
 }
 
-document.querySelector('.new')?.addEventListener('click', hideShowEdit)
-document.querySelector('.cancel')?.addEventListener('click', hideShowEdit)
+getCreateBookmark().addEventListener('click', hideShowEdit)
+getCancelCreateBookmark().addEventListener('click', hideShowEdit)
 
-const showNoResults = () => addBookmarkOption({ title: 'No results' })
+const showNoResults = () => addBookmarkOption({ id: '', title: 'No results' })
 
 const clearBookmarkList = () => getBookmarksList().replaceChildren()
 
-const createSearchHandler = (searchHandler: any) =>
-  getSearchInput().addEventListener('input', (e: any) => searchHandler(e.target.value))
+const createSearchHandler = (searchHandler: (s: string) => Promise<void>) =>
+  getSearchInput().addEventListener('input', (e) => searchHandler(unwrapValue(e)))
 
 const createFilterHandler = () => {
   // TODO: pass data in as param
   // TODO: make handle search a param or something
-  document.querySelector('.input-container .filter')?.addEventListener('click', (e: any) => {
-    const isFiltering = e.target.value === 'true'
-    e.target.value = !isFiltering
+  document.querySelector('.input-container .filter')?.addEventListener('click', (e) => {
+    const isFiltering = unwrapValue(e) === 'true'
+    if (e.target) {
+      (e.target as HTMLButtonElement).value = (!isFiltering).toString()
+    }
     data.bookmarks.setFilterFavorites(!isFiltering)
     handleSearch(getSearchInput().value)
   });
@@ -75,10 +86,12 @@ const createFilterHandler = () => {
 }
 
 const createSortHandler = () => {
-  document.querySelector('button.sort')?.addEventListener('click', (e: any) => {
+  document.querySelector('button.sort')?.addEventListener('click', (e) => {
     // consider asc/desc enum?
-    const isSorting = e.target.value === 'asc'
-    e.target.value = isSorting ? 'desc' : 'asc'
+    const isSorting = unwrapValue(e) === 'asc'
+    if (e.target) {
+      (e.target as HTMLButtonElement).value = isSorting ? 'desc' : 'asc'
+    }
     data.bookmarks.setSortingAsc(!isSorting)
     handleSearch(getSearchInput().value)
   })
@@ -91,15 +104,15 @@ export const bookmarks = { addBookmarkOption, showNoResults, clearBookmarkList, 
  */
 const DEFAULT_THEME = 'light'
 const getControlButtons = () => document.querySelectorAll('.controls > button')
-const selectTheme = (data: any, theme: any) => {
+const selectTheme = (d: typeof data.theme, theme: string) => {
   document.documentElement.setAttribute('data-theme', theme)
-  data.setTheme(theme)
+  d.setTheme(theme)
 }
 
-const createThemeHandler = (data: any) => {
-  getControlButtons().forEach(button => button.addEventListener('click', (e: any) => selectTheme(data, e.target.value)))
-  const currentTheme = data.getTheme() ?? DEFAULT_THEME
-  selectTheme(data, currentTheme)
+const createThemeHandler = (d: typeof data.theme) => {
+  getControlButtons().forEach(button => button.addEventListener('click', (e) => selectTheme(d, unwrapValue(e))))
+  const currentTheme = d.getTheme() ?? DEFAULT_THEME
+  selectTheme(d, currentTheme)
 }
 
 export const theme = { createThemeHandler }

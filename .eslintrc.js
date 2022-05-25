@@ -17,7 +17,10 @@ module.exports = {
   ],
   rules: {
     indent: 'off',
-    '@typescript-eslint/indent': ['error', 2]
+    '@typescript-eslint/indent': ['error', 2],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error'],
+    'no-undef': 'off' // dom types don't work with this on
   },
   ignorePatterns: [
     '**/*.html'

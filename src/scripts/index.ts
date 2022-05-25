@@ -3,7 +3,7 @@ import * as ui from './ui.js'
 
 const populateBookmarkList = async (search?: string) => {
   const bookmarks = await data.bookmarks.getBookmarks(search)
-  if (bookmarks.length > 0) { bookmarks.forEach((bookmark: any) => ui.bookmarks.addBookmarkOption(bookmark)) } else ui.bookmarks.showNoResults()
+  if (bookmarks.length > 0) { bookmarks.forEach(bookmark => ui.bookmarks.addBookmarkOption(bookmark)) } else ui.bookmarks.showNoResults()
 }
 
 export const handleSearch = async (searchTerm: string) => {
