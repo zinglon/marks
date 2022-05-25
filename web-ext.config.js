@@ -1,5 +1,5 @@
 module.exports = {
-  sourceDir: 'src',
+  sourceDir: 'build',
   artifactsDir: 'dist',
   build: {
     overwriteDest: true
