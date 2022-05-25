@@ -1,7 +1,7 @@
 {
   "scripts": {
     "build": "tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json build/ && web-ext --config=web-ext.config.js build --ignore-files \"**/*.ts\"",
-    "dev": "tsc --watch & nodemon -e css,html,json --watch src/ --ignore 'src/*.ts' --exec \"npm run copy\"",
+    "dev": "web-ext run & tsc --watch & nodemon -e css,html,json --watch src/ --ignore 'src/*.ts' --exec \"npm run copy\"",
     "copy": "copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json build/"
   },
   "devDependencies": {
