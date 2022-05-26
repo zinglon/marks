@@ -1,3 +1,5 @@
+import { Bookmark, ThemeOption } from '../types/index.js'
+
 /**
  * Bookmarks
  */
@@ -9,17 +11,20 @@ let isSortingAsc = true
 const setSortingAsc = (asc: boolean) => (isSortingAsc = asc)
 
 const getBookmarks = async (search?: string) => {
-  const isBookmark = (bookmark: browser.bookmarks.BookmarkTreeNode) => bookmark.type === 'bookmark'
-  const hasTitle = (bookmark: browser.bookmarks.BookmarkTreeNode) => bookmark.title
+  const isBookmark = (bookmark: Bookmark) => bookmark.type === 'bookmark'
+  const hasTitle = (bookmark: Bookmark) => bookmark.title
 
   const filters = [isBookmark, hasTitle]
   if (filterFavorites) filters.push((bookmark) => isFavorite(bookmark.id))
 
-  const bookmarkItems = await browser.bookmarks.search(search || {})
+  const bookmarkItems = (await browser.bookmarks.search(search || {})).map(bookmark => ({
+    ...bookmark,
+    isFavorite: isFavorite(bookmark.id)
+  }))
   const filteredBookmarks = bookmarkItems.filter(item => filters.every(filter => filter(item)))
 
-  const sortAscending = (a: browser.bookmarks.BookmarkTreeNode, b: browser.bookmarks.BookmarkTreeNode) => a.title.localeCompare(b.title)
-  const sortDescending = (a: browser.bookmarks.BookmarkTreeNode, b: browser.bookmarks.BookmarkTreeNode) => b.title.localeCompare(a.title)
+  const sortAscending = (a: Bookmark, b: Bookmark) => a.title.localeCompare(b.title)
+  const sortDescending = (a: Bookmark, b: Bookmark) => b.title.localeCompare(a.title)
 
   return filteredBookmarks.sort(isSortingAsc ? sortAscending : sortDescending)
 }
@@ -44,7 +49,7 @@ export const bookmarks = { getBookmarks, getFavorites, addFavorite, removeFavori
  * Theme
  */
 const themeKey = 'theme'
-const getTheme = () => localStorage.getItem(themeKey)
+const getTheme = () => localStorage.getItem(themeKey) ?? ThemeOption.Light
 const setTheme = (theme: string) => localStorage.setItem(themeKey, theme)
 
 export const theme = { getTheme, setTheme }
