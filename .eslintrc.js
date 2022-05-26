@@ -19,7 +19,11 @@ module.exports = {
     indent: 'off',
     '@typescript-eslint/indent': ['error', 2],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/no-unused-vars': ['error', {
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      caughtErrorsIgnorePattern: '^_'
+    }], // allow unused vars with _ prefix
     'no-undef': 'off' // dom types don't work with this on
   },
   ignorePatterns: [

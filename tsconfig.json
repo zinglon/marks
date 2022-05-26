@@ -12,7 +12,8 @@
     "./src/**/*.ts"
   ],
   "exclude": [
-    "./src/**/*.js"
+    "./src/**/*.js",
+    "./src/**/*.spec.ts"
   ],
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Recommended"

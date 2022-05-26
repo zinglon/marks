@@ -1,6 +1,6 @@
 export const unwrapValue = (e: Event) => (e.target as HTMLInputElement | HTMLSelectElement).value // ¯\_(ツ)_/¯
 
-const assertNotNull = <T>(value: T) => {
+export const assertNotNull = <T>(value: T) => {
   if (value === null) {
     throw new Error('Value is null')
   } else {
