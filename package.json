@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "build": "rimraf build/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json build/ && web-ext --config=web-ext.config.js build --ignore-files \"**/*.ts\"",
-    "dev": "web-ext run --config build & tsc --watch & nodemon -e css,html,json --watch src/ --ignore 'src/*.ts' --exec \"npm run copy\"",
-    "copy": "copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json build/",
+    "build": "rimraf build/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.js src/manifest.json build/ && web-ext --config=web-ext.config.js build --ignore-files \"**/*.ts\"",
+    "dev": "web-ext run --config build & tsc --watch & nodemon -e css,html,json,js --watch src/ --ignore 'src/*.ts' --exec \"npm run copy\"",
+    "copy": "copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.js build/",
     "test": "env mocha -r ts-node/register 'src/**/*.spec.ts'"
   },
   "devDependencies": {

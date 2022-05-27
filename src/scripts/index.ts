@@ -2,6 +2,20 @@ import * as data from '../data/index.js'
 import * as ui from './ui.js'
 import { unwrapValue } from '../lib/helpers.js'
 import { SortSetting } from '../types/index.js'
+// import { createApp } from '../petite-vue/index.js'
+// createApp({
+//   // exposed to all expressions
+//   count: 0,
+//   // getters
+//   get plusOne () {
+//     return this.count + 1
+//   },
+//   // methods
+//   increment () {
+//     this.count++
+//     console.log('test')
+//   }
+// }).mount()
 
 const favoriteHandler = (bookmarkId: string) => {
   const isFavorite = data.bookmarks.isFavorite(bookmarkId)
