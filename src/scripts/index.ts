@@ -1,63 +1,66 @@
 import * as data from '../data/index.js'
-import * as ui from './ui.js'
-import { unwrapValue } from '../lib/helpers.js'
-import { SortSetting } from '../types/index.js'
-// import { createApp } from '../petite-vue/index.js'
-// createApp({
-//   // exposed to all expressions
-//   count: 0,
-//   // getters
-//   get plusOne () {
-//     return this.count + 1
-//   },
-//   // methods
-//   increment () {
-//     this.count++
-//     console.log('test')
-//   }
-// }).mount()
+import { Bookmark, reactive } from '../types/index.js'
+import { createApp } from '../petite-vue/index.js'
 
-const favoriteHandler = (bookmarkId: string) => {
-  const isFavorite = data.bookmarks.isFavorite(bookmarkId)
-  if (isFavorite) {
-    data.bookmarks.removeFavorite(bookmarkId)
-  } else {
-    data.bookmarks.addFavorite(bookmarkId)
+const store = reactive({
+  bookmarks: [] as Bookmark[],
+  searchString: '',
+  isSearching: false,
+  isSorting: false,
+  isFiltering: false,
+  selectedBookmark: null as Bookmark | null,
+  async getBookmarks (searchString?: string) {
+    this.isSearching = true
+    this.searchString = searchString ?? ''
+    this.bookmarks = await data.bookmarks.getBookmarks(this.searchString, this.isFiltering, this.isSorting)
+    this.isSearching = false
+  },
+  async toggleSort () {
+    this.isSorting = !this.isSorting
+    await this.getBookmarks(this.searchString)
+  },
+  async toggleFilter () {
+    this.isFiltering = !this.isFiltering
+    await this.getBookmarks(this.searchString)
+  },
+  async toggleFavorite (bookmarkId: string) {
+    data.bookmarks.toggleFavorite(bookmarkId)
+    // Patch for better UX
+    const bookmark = this.bookmarks.find(bookmark => bookmark.id === bookmarkId)! // (O_o)
+    bookmark.isFavorite = !bookmark.isFavorite
+  },
+  createBookmark () {
+    this.selectedBookmark = { id: '', title: '', url: '' }
+  },
+  toggleEditing (bookmarkId?: string) {
+    this.selectedBookmark = bookmarkId ? this.bookmarks.find(bookmark => bookmark.id === bookmarkId)! : null
   }
-  return isFavorite
-}
+})
 
-const populateBookmarkList = async (search?: string) => {
-  const bookmarks = await data.bookmarks.getBookmarks(search)
-  if (bookmarks.length > 0) { bookmarks.forEach(bookmark => ui.bookmarks.addBookmarkOption(bookmark, favoriteHandler)) } else ui.bookmarks.showNoResults()
-}
+interface ThemeOption { id: string, label: string }
 
-export const handleSearch = async (searchTerm: string) => {
-  ui.bookmarks.clearBookmarkList()
-  await populateBookmarkList(searchTerm)
-}
-
-export const handleFilter = (e: Event) => {
-  const isFiltering = unwrapValue(e) === 'true'
-  if (e.target) {
-    (e.target as HTMLButtonElement).value = (!isFiltering).toString()
+const themeController = reactive({
+  themeOptions: [
+    { id: 'light', label: '☼' },
+    { id: 'dark', label: '☾' }
+  ],
+  selectTheme (theme: string) {
+    themeController.theme = theme
+  },
+  get theme () {
+    return data.theme.getTheme()
+  },
+  set theme (theme: string) {
+    data.theme.setTheme(theme)
+  },
+  get themeButtons (): ThemeOption[] {
+    return themeController.themeOptions.filter(button => button.id !== themeController.theme)
   }
-  data.bookmarks.setFilterFavorites(!isFiltering)
-}
+})
 
-export const handleSort = (e: Event) => {
-  const isSorting = unwrapValue(e) === SortSetting.Ascending
-  if (e.target) {
-    (e.target as HTMLButtonElement).value = isSorting ? SortSetting.Descending : SortSetting.Ascending
-  }
-  data.bookmarks.setSortingAsc(!isSorting)
-}
+store.getBookmarks()
 
-populateBookmarkList()
-ui.bookmarks.createSearchHandler(handleSearch)
-ui.bookmarks.createSortHandler()
-ui.bookmarks.createFilterHandler(data.bookmarks.getFilterFavorites())
-ui.theme.createThemeHandler(data.theme.getTheme, data.theme.setTheme)
+createApp({ store, themeController }).mount()
 
 // todo: add alt text to images
 // todo: clean up css

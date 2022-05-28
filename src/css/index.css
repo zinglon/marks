@@ -193,11 +193,11 @@ nav {
   border-radius: 0px 6px 6px 0px;
 }
 
-.input-container button.sort[value=asc]:before {
+.input-container button.sort[value=false]:before {
   content: "AZ↓"
 }
 
-.input-container button.sort[value=desc]:before {
+.input-container button.sort[value=true]:before {
   content: "AZ↑"
 }
 
@@ -206,6 +206,14 @@ nav {
 }
 
 .input-container button.filter[value=false]:before {
+  content: "☆"
+}
+
+button.favorite[value=true]:before {
+  content: "★"
+}
+
+button.favorite[value=false]:before {
   content: "☆"
 }
 

@@ -1,3 +1,5 @@
+import { reactive as VueReactive } from '../petite-vue/index.js'
+
 export interface Bookmark extends browser.bookmarks.BookmarkTreeNode {
   isFavorite?: boolean
 }
@@ -16,3 +18,5 @@ export enum ThemeOption {
   Light = 'light',
   Dark = 'dark'
 }
+
+export const reactive = <T>(value: T) => VueReactive(value) as T

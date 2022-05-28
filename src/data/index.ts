@@ -3,30 +3,29 @@ import { Bookmark, ThemeOption } from '../types/index.js'
 /**
  * Bookmarks
  */
-let filterFavorites = false
-const setFilterFavorites = (filter: boolean) => (filterFavorites = filter)
-const getFilterFavorites = () => filterFavorites
 
-let isSortingAsc = true
-const setSortingAsc = (asc: boolean) => (isSortingAsc = asc)
+// Filters
+const isBookmark = (bookmark: Bookmark) => bookmark.type === 'bookmark'
+const hasTitle = (bookmark: Bookmark) => bookmark.title
 
-const getBookmarks = async (search?: string) => {
-  const isBookmark = (bookmark: Bookmark) => bookmark.type === 'bookmark'
-  const hasTitle = (bookmark: Bookmark) => bookmark.title
+// Sorts
+const sortAscending = (a: Bookmark, b: Bookmark) => a.title.localeCompare(b.title)
+const sortDescending = (a: Bookmark, b: Bookmark) => b.title.localeCompare(a.title)
 
-  const filters = [isBookmark, hasTitle]
-  if (filterFavorites) filters.push((bookmark) => isFavorite(bookmark.id))
-
+const getBookmarks = async (search?: string, isFiltering?: boolean, isSorting?: boolean) => {
+  // Get
   const bookmarkItems = (await browser.bookmarks.search(search || {})).map(bookmark => ({
     ...bookmark,
     isFavorite: isFavorite(bookmark.id)
   }))
+
+  // Filter
+  const filters = [isBookmark, hasTitle]
+  if (isFiltering) filters.push((bookmark: Bookmark) => isFavorite(bookmark.id))
   const filteredBookmarks = bookmarkItems.filter(item => filters.every(filter => filter(item)))
 
-  const sortAscending = (a: Bookmark, b: Bookmark) => a.title.localeCompare(b.title)
-  const sortDescending = (a: Bookmark, b: Bookmark) => b.title.localeCompare(a.title)
-
-  return filteredBookmarks.sort(isSortingAsc ? sortAscending : sortDescending)
+  // Sort
+  return [...filteredBookmarks].sort(isSorting ? sortDescending : sortAscending)
 }
 
 const favoritesKey = 'favorites'
@@ -43,7 +42,11 @@ const removeFavorite = (bookmarkId: string) => {
 const isFavorite = (bookmarkId: string) => getFavorites().some(id => id === bookmarkId)
 const setFavorites = (favorites: string[]) => localStorage.setItem(favoritesKey, JSON.stringify(favorites))
 
-export const bookmarks = { getBookmarks, getFavorites, addFavorite, removeFavorite, isFavorite, setFilterFavorites, getFilterFavorites, setSortingAsc }
+const toggleFavorite = (bookmarkId: string) => {
+  isFavorite(bookmarkId) ? removeFavorite(bookmarkId) : addFavorite(bookmarkId)
+}
+
+export const bookmarks = { getBookmarks, toggleFavorite }
 
 /**
  * Theme
