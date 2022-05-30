@@ -1,22 +1,18 @@
-import { reactive as VueReactive } from '../petite-vue/index.js'
-
 export interface Bookmark extends browser.bookmarks.BookmarkTreeNode {
-  isFavorite?: boolean
+  isFavorite?: boolean;
 }
 
 export enum SortSetting {
-  Ascending = 'asc',
-  Descending = 'desc'
+  Ascending = "AZ↓",
+  Descending = "AZ↑",
 }
 
 export enum FavoriteStatus {
-  Favorite = '★',
-  NotFavorite = '☆'
+  Favorite = "★",
+  NotFavorite = "☆",
 }
 
 export enum ThemeOption {
-  Light = 'light',
-  Dark = 'dark'
+  Light = "light",
+  Dark = "dark",
 }
-
-export const reactive = <T>(value: T) => VueReactive(value) as T

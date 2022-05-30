@@ -1,32 +1,22 @@
 module.exports = {
   env: {
     browser: true,
+    node: true,
     es2021: true,
-    webextensions: true
   },
   extends: [
-    'standard'
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended",
+    "@vue/typescript/recommended",
+    "@vue/prettier",
+    "@vue/prettier/@typescript-eslint",
   ],
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module'
+  plugins: ["vue", "html"],
+  globals: {
+    defineProps: "readonly",
   },
-  plugins: [
-    '@typescript-eslint'
-  ],
   rules: {
-    indent: 'off',
-    '@typescript-eslint/indent': ['error', 2],
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', {
-      argsIgnorePattern: '^_',
-      varsIgnorePattern: '^_',
-      caughtErrorsIgnorePattern: '^_'
-    }], // allow unused vars with _ prefix
-    'no-undef': 'off' // dom types don't work with this on
+    "vue/multi-word-component-names": "off",
+    "no-undef": "off", // dom types don't work with this on
   },
-  ignorePatterns: [
-    '**/*.html'
-  ]
-}
+};

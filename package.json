@@ -1,27 +1,30 @@
 {
+  "name": "vite-template",
+  "version": "0.0.0",
   "scripts": {
-    "build": "rimraf build/ && tsc && copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.js src/manifest.json build/ && web-ext --config=web-ext.config.js build --ignore-files \"**/*.ts\"",
-    "dev": "web-ext run --config build & tsc --watch & nodemon -e css,html,json,js --watch src/ --ignore 'src/*.ts' --exec \"npm run copy\"",
-    "copy": "copyfiles -u 1 src/**/*.html src/**/*.css src/**/*.json src/**/*.js build/",
-    "test": "env mocha -r ts-node/register 'src/**/*.spec.ts'"
+    "dev": "web-ext run --config web-ext.config.js & nodemon -e css,html,json,js,ts,vue --watch src/ --exec \"npm run build-lite\"",
+    "build-lite": "vite build",
+    "build": "vue-tsc --noEmit && vite build && web-ext --config=web-ext.config.js build"
+  },
+  "dependencies": {
+    "vue": "^3.2.16",
+    "vue-router": "^4.0.15"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.1",
-    "@types/mocha": "^9.1.1",
-    "@typescript-eslint/eslint-plugin": "^5.26.0",
-    "@typescript-eslint/parser": "^5.26.0",
-    "chai": "^4.3.6",
-    "copyfiles": "^2.4.1",
-    "eslint": "^8.11.0",
-    "eslint-config-standard": "^17.0.0",
-    "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-n": "^15.2.0",
-    "eslint-plugin-promise": "^6.0.0",
-    "mocha": "^10.0.0",
+    "@types/node": "^17.0.36",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/eslint-config-prettier": "^6.0.0",
+    "@vue/eslint-config-typescript": "^9.1.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.3.0",
+    "eslint-plugin-html": "^6.2.0",
+    "eslint-plugin-vue": "^8.1.1",
     "nodemon": "^2.0.16",
-    "rimraf": "^3.0.2",
-    "ts-node": "^10.8.0",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.7",
     "typescript": "^4.7.2",
+    "vite": "^2.6.4",
+    "vue-tsc": "^0.3.0",
     "web-ext": "^6.8.0",
     "web-ext-types": "^3.2.1"
   }
