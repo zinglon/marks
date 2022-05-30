@@ -48,7 +48,7 @@ const save = async () => {
 
 const remove = async () => {
   await data.bookmarks.removeBookmark(bookmark.value.id);
-  push("/");
+  push({ name: "home" });
 };
 
 const toggleFavorite = () =>
@@ -131,7 +131,7 @@ const confirmation = ref(false);
         </button>
         <router-link
           class="w-full bg-blue-800 dark:bg-zinc-600 rounded-lg p-2 text-center"
-          to="/"
+          :to="{ name: 'home' }"
           >Cancel</router-link
         >
         <div class="mt-2 w-full rounded-lg p-2 text-center text-red-400">

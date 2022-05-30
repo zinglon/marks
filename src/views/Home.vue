@@ -41,6 +41,7 @@ const toggleFavorite = async (bookmarkId: string) => {
     >
       <input
         v-model="searchString"
+        autofocus
         class="w-full bg-blue-900 dark:bg-zinc-700 rounded-lg p-2"
         placeholder="Search"
       />

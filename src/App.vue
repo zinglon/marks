@@ -5,8 +5,7 @@ import { ThemeOption } from "./types";
 import * as data from "./data";
 
 const { push } = useRouter();
-onMounted(() => push("/"));
-
+onMounted(() => push({ name: "home" }));
 const theme = ref<ThemeOption>(ThemeOption.Light);
 onMounted(() => (theme.value = data.theme.getTheme()));
 const toggleTheme = () => (theme.value = data.theme.toggleTheme());
