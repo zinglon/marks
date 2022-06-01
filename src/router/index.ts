@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 import Home from "../views/Home.vue";
-import Bookmark from "../views/Bookmark.vue";
 // import Redirect from "../views/Redirect.vue";
 
 const router = createRouter({
@@ -15,12 +14,6 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: Home,
-    },
-    {
-      path: "/bookmark",
-      name: "bookmark",
-      component: Bookmark,
-      props: true,
     },
   ],
 });
