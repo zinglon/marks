@@ -141,12 +141,24 @@ const {
   remove,
   save,
 } = useBookmarkEditor(getBookmarks);
+
+const tagInput = ref<HTMLInputElement>();
+const tags = ref<string[]>([]);
+const addTag = () => {
+  const value = tagInput.value?.value.trim();
+  if (tagInput.value && value) {
+    if (!tags.value.some((tag) => tag === value)) tags.value.push(value);
+    tagInput.value.value = "";
+  }
+};
+const removeTag = (tag: string) =>
+  (tags.value = tags.value.filter((t) => t !== tag));
 </script>
 
 <template>
   <div class="flex-1 flex justify-center items-center text-sm">
     <div
-      class="flex-1 flex h-full mx-8 md:mx-0 md:max-w-2xl md:max-h-96 md:mb-6 2xl:max-w-4xl 2xl:max-h-[32rem] bg-white dark:bg-gray-900 rounded-lg drop-shadow-[0_24px_24px_rgba(0,0,0,0.50)]"
+      class="flex-1 flex h-full mx-8 md:mx-0 md:max-w-2xl md:max-h-[30rem] md:mb-6 2xl:max-w-4xl 2xl:max-h-[32rem] bg-white dark:bg-gray-900 rounded-lg drop-shadow-[0_24px_24px_rgba(0,0,0,0.50)]"
     >
       <div class="flex-1 flex flex-col max-w-full">
         <div class="flex-1 flex flex-row overflow-hidden">
@@ -211,8 +223,8 @@ const {
               <h2 class="text-center pb-4">
                 {{ selectedBookmark.id ? `Edit` : `Add` }} Bookmark
               </h2>
-              <div class="flex-1 flex flex-col">
-                <div class="flex flex-col space-y-2">
+              <div class="flex-1 flex flex-col overflow-hidden">
+                <div class="flex flex-col space-y-2 overflow-hidden">
                   <TextInput
                     v-model="selectedBookmark.title"
                     placeholder="Title"
@@ -229,6 +241,42 @@ const {
                         : FavoriteStatus.NotFavorite
                     }}
                   </button>
+                  <input
+                    ref="tagInput"
+                    list="tagSuggestions"
+                    class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
+                    placeholder="Add Tag"
+                    @keydown.enter="addTag"
+                  />
+                  <datalist id="tagSuggestions">
+                    <option v-for="tag in tags" :key="tag">{{ tag }}</option>
+                  </datalist>
+                  <div class="flex flex-row flex-wrap gap-2 overflow-y-auto">
+                    <div
+                      v-for="tag in tags"
+                      :key="tag"
+                      class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
+                    >
+                      {{ tag }}
+                      <button
+                        class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
+                        @click="removeTag(tag)"
+                      >
+                        <svg
+                          class="h-2 w-2"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 8 8"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-width="1.5"
+                            d="M1 1l6 6m0-6L1 7"
+                          />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
                   <p class="text-red-500 text-center">{{ error }}</p>
                 </div>
                 <div
