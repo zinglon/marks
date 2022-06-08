@@ -1,112 +1,153 @@
 <script setup lang="ts">
 import TextInput from "../components/TextInput.vue";
 import FormButton from "../components/FormButton.vue";
-import CommandPalette from "../components/CommandPalette.vue";
 import IconButton from "../components/IconButton.vue";
 import ListItem from "../components/ListItem.vue";
 import { onMounted, ref, watch } from "vue";
 import { Bookmark, FavoriteStatus, SortSetting } from "../types";
 import * as data from "../data";
 
-const searchString = ref<string>();
-const bookmarks = ref<Bookmark[]>([]);
-const getBookmarks = async () => {
-  bookmarks.value = await data.bookmarks.getBookmarks(
-    searchString.value,
-    isSorting.value,
-    isFiltering.value
+const useBookmarkList = () => {
+  const searchString = ref<string>();
+  const bookmarks = ref<Bookmark[]>([]);
+  const getBookmarks = async () =>
+    (bookmarks.value = await data.bookmarks.getBookmarks(
+      searchString.value,
+      isSorting.value,
+      isFiltering.value
+    ));
+
+  onMounted(async () => await getBookmarks());
+
+  const isSorting = ref(false);
+  const toggleSort = () => (isSorting.value = !isSorting.value);
+
+  const isFiltering = ref(false);
+  const toggleFilter = () => (isFiltering.value = !isFiltering.value);
+
+  watch(
+    [searchString, isSorting, isFiltering],
+    async () => await getBookmarks()
   );
-};
-onMounted(async () => await getBookmarks());
-
-const isSorting = ref(false);
-const toggleSort = () => (isSorting.value = !isSorting.value);
-
-const isFiltering = ref(false);
-const toggleFilter = () => (isFiltering.value = !isFiltering.value);
-
-watch([searchString, isSorting, isFiltering], async () => await getBookmarks());
-
-const toggleFavorite = async (bookmarkId: string) => {
-  data.bookmarks.toggleFavorite(bookmarkId);
-  await getBookmarks();
-};
-
-const selectedBookmark = ref<Bookmark>();
-const editBookmark = async (bookmarkId: string) => {
-  if (bookmarkId === selectedBookmark.value?.id) {
-    selectedBookmark.value = undefined;
-  } else {
-    selectedBookmark.value = await data.bookmarks.getBookmark(bookmarkId);
-  }
-};
-
-const supportedProtocols = ref<string[]>([]);
-onMounted(async () => {
-  supportedProtocols.value = data.bookmarks.getSupportedProtocols();
-});
-
-const hasError = (bookmark: Bookmark) => {
-  if (
-    !supportedProtocols.value.some((protocol) =>
-      bookmark.url?.startsWith(protocol)
-    )
-  ) {
-    return `URL must start with ` + supportedProtocols.value.join(", ");
-  }
-};
-
-const error = ref<string>();
-watch(selectedBookmark, () => (error.value = undefined), { deep: true });
-
-const save = async () => {
-  if (!selectedBookmark.value) return;
-  error.value = hasError(selectedBookmark.value);
-  if (!error.value) {
-    try {
-      if (selectedBookmark.value.id) {
-        await data.bookmarks.updateBookmark(selectedBookmark.value);
-      } else {
-        selectedBookmark.value = await data.bookmarks.createBookmark(
-          selectedBookmark.value
-        );
-      }
-    } catch (err) {
-      error.value = "Something went wrong";
-    }
-  }
-  await getBookmarks();
-};
-
-const remove = async () => {
-  if (!selectedBookmark.value) return;
-  await data.bookmarks.removeBookmark(selectedBookmark.value.id);
-  selectedBookmark.value = undefined;
-  confirmation.value = false;
-  await getBookmarks();
-};
-
-const addBookmark = () => {
-  selectedBookmark.value = {
-    id: "",
-    title: "",
-    url: "",
-    isFavorite: false,
+  const toggleFavorite = async (bookmarkId: string) => {
+    data.bookmarks.toggleFavorite(bookmarkId);
+    await getBookmarks();
+  };
+  const go = () => {
+    if (bookmarks.value.length && bookmarks.value[0].url)
+      window.location.href = bookmarks.value[0].url;
+  };
+  return {
+    searchString,
+    bookmarks,
+    isSorting,
+    isFiltering,
+    getBookmarks,
+    toggleSort,
+    toggleFilter,
+    toggleFavorite,
+    go,
   };
 };
 
-const confirmation = ref(false);
+const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
+  const selectedBookmark = ref<Bookmark>();
+  const editBookmark = async (bookmarkId: string) =>
+    (selectedBookmark.value =
+      bookmarkId === selectedBookmark.value?.id
+        ? undefined
+        : await data.bookmarks.getBookmark(bookmarkId));
 
-const go = () => {
-  if (bookmarks.value.length && bookmarks.value[0].url) {
-    window.location.href = bookmarks.value[0].url;
-  }
+  const supportedProtocols = ref<string[]>([]);
+  onMounted(
+    async () =>
+      (supportedProtocols.value = data.bookmarks.getSupportedProtocols())
+  );
+
+  const hasError = (bookmark: Bookmark) =>
+    supportedProtocols.value.some((protocol) =>
+      bookmark.url?.startsWith(protocol)
+    )
+      ? undefined
+      : `URL must start with ` + supportedProtocols.value.join(", ");
+
+  const error = ref<string>();
+  watch(selectedBookmark, () => (error.value = undefined), { deep: true });
+
+  const save = async () => {
+    if (!selectedBookmark.value) return;
+    error.value = hasError(selectedBookmark.value);
+    if (!error.value) {
+      try {
+        if (selectedBookmark.value.id)
+          await data.bookmarks.updateBookmark(selectedBookmark.value);
+        else
+          selectedBookmark.value = await data.bookmarks.createBookmark(
+            selectedBookmark.value
+          );
+      } catch (err) {
+        error.value = "Something went wrong";
+      }
+    }
+    await getBookmarks();
+  };
+
+  const remove = async () => {
+    if (!selectedBookmark.value) return;
+    await data.bookmarks.removeBookmark(selectedBookmark.value.id);
+    selectedBookmark.value = undefined;
+    confirmation.value = false;
+    await getBookmarks();
+  };
+
+  const addBookmark = () =>
+    (selectedBookmark.value = {
+      id: "",
+      title: "",
+      url: "",
+      isFavorite: false,
+    });
+
+  const confirmation = ref(false);
+  return {
+    selectedBookmark,
+    editBookmark,
+    addBookmark,
+    confirmation,
+    remove,
+    error,
+    save,
+  };
 };
+
+const {
+  searchString,
+  bookmarks,
+  isSorting,
+  isFiltering,
+  getBookmarks,
+  toggleSort,
+  toggleFilter,
+  toggleFavorite,
+  go,
+} = useBookmarkList();
+
+const {
+  confirmation,
+  selectedBookmark,
+  error,
+  editBookmark,
+  addBookmark,
+  remove,
+  save,
+} = useBookmarkEditor(getBookmarks);
 </script>
 
 <template>
   <div class="flex-1 flex justify-center items-center text-sm">
-    <CommandPalette>
+    <div
+      class="flex-1 flex h-full mx-8 md:mx-0 md:max-w-2xl md:max-h-96 md:mb-6 2xl:max-w-4xl 2xl:max-h-[32rem] bg-white dark:bg-gray-900 rounded-lg drop-shadow-[0_24px_24px_rgba(0,0,0,0.50)]"
+    >
       <div class="flex-1 flex flex-col max-w-full">
         <div class="flex-1 flex flex-row overflow-hidden">
           <div
@@ -207,6 +248,6 @@ const go = () => {
           </div>
         </div>
       </div>
-    </CommandPalette>
+    </div>
   </div>
 </template>
