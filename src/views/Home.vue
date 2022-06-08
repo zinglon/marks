@@ -191,8 +191,10 @@ const {
             </ul>
           </div>
           <div
-            v-if="selectedBookmark"
-            class="min-w-full sm:min-w-[40%] overflow-hidden break-words flex flex-col p-4 sm:border-l dark:border-gray-700"
+            class="w-0 opacity-0 overflow-hidden break-words flex flex-col sm:border-l dark:border-gray-700 transition-[width,opacity] duration-[300ms] delay-[0ms]"
+            :class="{
+              'min-w-full opacity-100 sm:min-w-0 sm:w-80 p-4': selectedBookmark,
+            }"
           >
             <template v-if="confirmation">
               <div class="flex flex-col flex-1 text-center">
@@ -205,7 +207,7 @@ const {
                 </FormButton>
               </div>
             </template>
-            <template v-else>
+            <template v-else-if="selectedBookmark">
               <h2 class="text-center pb-4">
                 {{ selectedBookmark.id ? `Edit` : `Add` }} Bookmark
               </h2>
