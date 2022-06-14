@@ -150,29 +150,20 @@ const tagOptions = ref<string[]>([]);
 const getTagOptions = () => (tagOptions.value = data.bookmarks.getAllTags());
 
 const tagInput = ref<HTMLInputElement>();
-const addTag = async () => {
+const addTag = () => {
   const value = tagInput.value?.value.trim();
-  if (tagInput.value) {
-    if (value && selectedBookmark.value) {
-      data.bookmarks.addTag(selectedBookmark.value.id, value);
-      selectedBookmark.value = await data.bookmarks.getBookmark(
-        selectedBookmark.value.id
-      );
-      await getBookmarks();
-      getTagOptions();
-    }
+  if (tagInput.value && value && selectedBookmark.value) {
+    if (!selectedBookmark.value.tags) selectedBookmark.value.tags = [];
+    if (!selectedBookmark.value.tags.includes(value))
+      selectedBookmark.value.tags.push(value);
     tagInput.value.value = "";
   }
 };
-const removeTag = async (tag: string) => {
-  if (selectedBookmark.value) {
-    data.bookmarks.removeTag(selectedBookmark.value.id, tag);
-    selectedBookmark.value = await data.bookmarks.getBookmark(
-      selectedBookmark.value.id
+const removeTag = (tag: string) => {
+  if (selectedBookmark.value)
+    selectedBookmark.value.tags = selectedBookmark.value.tags?.filter(
+      (t) => t !== tag
     );
-    await getBookmarks();
-    getTagOptions();
-  }
 };
 </script>
 
@@ -265,46 +256,44 @@ const removeTag = async (tag: string) => {
                         : FavoriteStatus.NotFavorite
                     }}
                   </button>
-                  <template v-if="selectedBookmark.id">
-                    <input
-                      ref="tagInput"
-                      list="tagSuggestions"
-                      class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
-                      placeholder="Add Tag"
-                      @keydown.enter="addTag"
-                    />
-                    <datalist id="tagSuggestions">
-                      <option v-for="tag in tagOptions" :key="tag">
-                        {{ tag }}
-                      </option>
-                    </datalist>
-                    <div class="flex flex-row flex-wrap gap-2 overflow-y-auto">
-                      <div
-                        v-for="tag in selectedBookmark.tags"
-                        :key="tag"
-                        class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
+                  <input
+                    ref="tagInput"
+                    list="tagSuggestions"
+                    class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
+                    placeholder="Add Tag"
+                    @keydown.enter="addTag"
+                  />
+                  <datalist id="tagSuggestions">
+                    <option v-for="tag in tagOptions" :key="tag">
+                      {{ tag }}
+                    </option>
+                  </datalist>
+                  <div class="flex flex-row flex-wrap gap-2 overflow-y-auto">
+                    <div
+                      v-for="tag in selectedBookmark.tags"
+                      :key="tag"
+                      class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
+                    >
+                      {{ tag }}
+                      <button
+                        class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
+                        @click="removeTag(tag)"
                       >
-                        {{ tag }}
-                        <button
-                          class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
-                          @click="removeTag(tag)"
+                        <svg
+                          class="h-2 w-2"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 8 8"
                         >
-                          <svg
-                            class="h-2 w-2"
-                            stroke="currentColor"
-                            fill="none"
-                            viewBox="0 0 8 8"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-width="1.5"
-                              d="M1 1l6 6m0-6L1 7"
-                            />
-                          </svg>
-                        </button>
-                      </div>
+                          <path
+                            stroke-linecap="round"
+                            stroke-width="1.5"
+                            d="M1 1l6 6m0-6L1 7"
+                          />
+                        </svg>
+                      </button>
                     </div>
-                  </template>
+                  </div>
                   <p class="text-red-500 text-center">{{ error }}</p>
                 </div>
                 <div

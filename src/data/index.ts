@@ -79,7 +79,7 @@ const updateBookmark = async (bookmark: Bookmark) => {
     url: bookmark.url ?? "",
   });
   bookmark.isFavorite ? addFavorite(bookmark.id) : removeFavorite(bookmark.id);
-  bookmark.tags?.forEach((tag) => addTag(bookmark.id, tag));
+  setTags(bookmark.id, bookmark.tags ?? []);
   return result;
 };
 
@@ -89,6 +89,7 @@ const createBookmark = async (bookmark: Bookmark) => {
     url: bookmark.url,
   });
   if (bookmark.isFavorite) addFavorite(id);
+  if (bookmark.tags) setTags(id, bookmark.tags);
   return {
     id,
     title,
@@ -98,8 +99,11 @@ const createBookmark = async (bookmark: Bookmark) => {
   };
 };
 
-const removeBookmark = async (bookmarkId: string) =>
+const removeBookmark = async (bookmarkId: string) => {
   await browser.bookmarks.remove(bookmarkId);
+  removeFavorite(bookmarkId);
+  setTags(bookmarkId);
+};
 
 const favoritesKey = "favorites";
 const getFavorites = (): string[] =>
@@ -149,13 +153,11 @@ const addTag = (bookmarkId: string, tag: string) => {
   localStorage.setItem(tagsKey, JSON.stringify(tags));
 };
 
-const removeTag = (bookmarkId: string, tag: string) => {
-  let tags = getBookmarkTags();
-  let tagsForBookmark = getTagsForBookmark(bookmarkId);
-  tags = tags.filter((t) => t.bookmarkId !== bookmarkId);
-  tagsForBookmark = tagsForBookmark.filter((t) => t !== tag);
-  tags.push({ bookmarkId: bookmarkId, tags: tagsForBookmark });
-  localStorage.setItem(tagsKey, JSON.stringify(tags));
+const setTags = (bookmarkId: string, tags?: string[]) => {
+  let bookmarkTags = getBookmarkTags();
+  bookmarkTags = bookmarkTags.filter((tag) => tag.bookmarkId !== bookmarkId);
+  if (tags?.length) bookmarkTags.push({ bookmarkId: bookmarkId, tags: tags });
+  localStorage.setItem(tagsKey, JSON.stringify(bookmarkTags));
 };
 
 export const bookmarks = {
@@ -167,7 +169,6 @@ export const bookmarks = {
   getSupportedProtocols,
   removeBookmark,
   addTag,
-  removeTag,
   getAllTags,
 };
 
