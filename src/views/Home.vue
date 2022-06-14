@@ -1,17 +1,9 @@
-<script setup lang="ts">
-import TextInput from "../components/TextInput.vue";
-import FormButton from "../components/FormButton.vue";
-import IconButton from "../components/IconButton.vue";
-import ListItem from "../components/ListItem.vue";
-import { onMounted, ref, watch } from "vue";
-import { Bookmark, FavoriteStatus, SortSetting } from "../types";
-import * as data from "../data";
-
-const useBookmarkList = () => {
+<script lang="ts">
+const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
   const searchString = ref<string>();
   const bookmarks = ref<Bookmark[]>([]);
   const getBookmarks = async () =>
-    (bookmarks.value = await data.bookmarks.getBookmarks(
+    (bookmarks.value = await bookmarkData.getBookmarks(
       searchString.value,
       isSorting.value,
       isFiltering.value
@@ -30,7 +22,7 @@ const useBookmarkList = () => {
     async () => await getBookmarks()
   );
   const toggleFavorite = async (bookmarkId: string) => {
-    data.bookmarks.toggleFavorite(bookmarkId);
+    bookmarkData.toggleFavorite(bookmarkId);
     await getBookmarks();
   };
   const go = () => {
@@ -50,21 +42,26 @@ const useBookmarkList = () => {
   };
 };
 
-const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
-  const selectedBookmark = ref<Bookmark>();
+const useBookmarkEditor = (
+  bookmarkData: BookmarkDataAccessor,
+  selectedBookmark: Ref<Bookmark | undefined>,
+  getBookmarks: () => Promise<Bookmark[]>,
+  getTagOptions: () => string[],
+  clearTagInput: () => void
+) => {
   const editBookmark = async (bookmarkId: string) => {
     selectedBookmark.value =
       bookmarkId === selectedBookmark.value?.id
         ? undefined
-        : await data.bookmarks.getBookmark(bookmarkId);
-    if (tagInput.value) tagInput.value.value = "";
+        : await bookmarkData.getBookmark(bookmarkId);
+    clearTagInput();
     getTagOptions();
   };
 
   const supportedProtocols = ref<string[]>([]);
   onMounted(
     async () =>
-      (supportedProtocols.value = data.bookmarks.getSupportedProtocols())
+      (supportedProtocols.value = bookmarkData.getSupportedProtocols())
   );
 
   const hasError = (bookmark: Bookmark) =>
@@ -83,9 +80,9 @@ const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
     if (!error.value) {
       try {
         if (selectedBookmark.value.id)
-          await data.bookmarks.updateBookmark(selectedBookmark.value);
+          await bookmarkData.updateBookmark(selectedBookmark.value);
         else
-          selectedBookmark.value = await data.bookmarks.createBookmark(
+          selectedBookmark.value = await bookmarkData.createBookmark(
             selectedBookmark.value
           );
       } catch (err) {
@@ -97,7 +94,7 @@ const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
 
   const remove = async () => {
     if (!selectedBookmark.value) return;
-    await data.bookmarks.removeBookmark(selectedBookmark.value.id);
+    await bookmarkData.removeBookmark(selectedBookmark.value.id);
     selectedBookmark.value = undefined;
     confirmation.value = false;
     await getBookmarks();
@@ -124,6 +121,53 @@ const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
   };
 };
 
+const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
+  const tagOptions = ref<string[]>([]);
+  const getTagOptions = () => (tagOptions.value = bookmarkData.getAllTags());
+
+  const tagInput = ref<HTMLInputElement>();
+  const addTag = () => {
+    const value = tagInput.value?.value.trim();
+    if (tagInput.value && value && selectedBookmark.value) {
+      if (!selectedBookmark.value.tags) selectedBookmark.value.tags = [];
+      if (!selectedBookmark.value.tags.includes(value))
+        selectedBookmark.value.tags.push(value);
+      tagInput.value.value = "";
+    }
+  };
+  const removeTag = (tag: string) => {
+    if (selectedBookmark.value)
+      selectedBookmark.value.tags = selectedBookmark.value.tags?.filter(
+        (t) => t !== tag
+      );
+  };
+
+  const clearTagInput = () => {
+    if (tagInput.value) tagInput.value.value = "";
+  };
+  return {
+    tagOptions,
+    tagInput,
+    addTag,
+    removeTag,
+    getTagOptions,
+    clearTagInput,
+  };
+};
+</script>
+
+<script setup lang="ts">
+import TextInput from "../components/TextInput.vue";
+import FormButton from "../components/FormButton.vue";
+import IconButton from "../components/IconButton.vue";
+import ListItem from "../components/ListItem.vue";
+import { onMounted, Ref, ref, watch } from "vue";
+import { Bookmark, FavoriteStatus, SortSetting } from "../types";
+import { bookmarks as bookmarkData } from "../data";
+import { BookmarkDataAccessor } from "../data";
+
+const selectedBookmark = ref<Bookmark>();
+
 const {
   searchString,
   bookmarks,
@@ -134,37 +178,25 @@ const {
   toggleFilter,
   toggleFavorite,
   go,
-} = useBookmarkList();
+} = useBookmarkList(bookmarkData);
 
 const {
-  confirmation,
-  selectedBookmark,
-  error,
-  editBookmark,
-  addBookmark,
-  remove,
-  save,
-} = useBookmarkEditor(getBookmarks);
+  tagOptions,
+  tagInput,
+  addTag,
+  removeTag,
+  getTagOptions,
+  clearTagInput,
+} = useTags(selectedBookmark);
 
-const tagOptions = ref<string[]>([]);
-const getTagOptions = () => (tagOptions.value = data.bookmarks.getAllTags());
-
-const tagInput = ref<HTMLInputElement>();
-const addTag = () => {
-  const value = tagInput.value?.value.trim();
-  if (tagInput.value && value && selectedBookmark.value) {
-    if (!selectedBookmark.value.tags) selectedBookmark.value.tags = [];
-    if (!selectedBookmark.value.tags.includes(value))
-      selectedBookmark.value.tags.push(value);
-    tagInput.value.value = "";
-  }
-};
-const removeTag = (tag: string) => {
-  if (selectedBookmark.value)
-    selectedBookmark.value.tags = selectedBookmark.value.tags?.filter(
-      (t) => t !== tag
-    );
-};
+const { confirmation, error, editBookmark, addBookmark, remove, save } =
+  useBookmarkEditor(
+    bookmarkData,
+    selectedBookmark,
+    getBookmarks,
+    getTagOptions,
+    clearTagInput
+  );
 </script>
 
 <template>
@@ -276,21 +308,10 @@ const removeTag = (tag: string) => {
                     >
                       {{ tag }}
                       <button
-                        class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
+                        class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl w-5 h-5"
                         @click="removeTag(tag)"
                       >
-                        <svg
-                          class="h-2 w-2"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 8 8"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-width="1.5"
-                            d="M1 1l6 6m0-6L1 7"
-                          />
-                        </svg>
+                        ✕
                       </button>
                     </div>
                   </div>

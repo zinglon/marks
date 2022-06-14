@@ -187,3 +187,5 @@ const toggleTheme = () => {
 };
 
 export const theme = { toggleTheme, getTheme };
+
+export type BookmarkDataAccessor = typeof bookmarks;
