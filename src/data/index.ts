@@ -20,18 +20,34 @@ const getBookmarks = async (
   isFiltering?: boolean
 ) => {
   // Get
-  const bookmarkItems = (await browser.bookmarks.search(search || {})).map(
+  const bookmarkItems = (await browser.bookmarks.search({})).map(
     (bookmark) => ({
       ...bookmark,
       isFavorite: isFavorite(bookmark.id),
+      tags: getTagsForBookmark(bookmark.id) ?? [],
     })
   );
+
+  // Search
+  const searchResults: Bookmark[] = search
+    ? bookmarkItems.filter((bookmark) => {
+        const itemsToMatch = [
+          bookmark.title.toLowerCase(),
+          bookmark.url?.toLowerCase() ?? "",
+          ...bookmark.tags.map((tag) => tag.toLowerCase()),
+        ];
+
+        const searchTerm = search?.toLowerCase();
+        const isMatch = itemsToMatch.some((item) => item.includes(searchTerm));
+        return isMatch;
+      })
+    : bookmarkItems;
 
   // Filter
   const filters = [isBookmark, hasTitle];
   if (isFiltering)
     filters.push((bookmark: Bookmark) => isFavorite(bookmark.id));
-  const filteredBookmarks = bookmarkItems.filter((item) =>
+  const filteredBookmarks = searchResults.filter((item) =>
     filters.every((filter) => filter(item))
   );
 
@@ -41,7 +57,13 @@ const getBookmarks = async (
 
 const getBookmark = async (bookmarkId: string) => {
   const { id, title, url } = (await browser.bookmarks.get(bookmarkId))[0];
-  return { id, title, url, isFavorite: isFavorite(id) };
+  return {
+    id,
+    title,
+    url,
+    isFavorite: isFavorite(id),
+    tags: getTagsForBookmark(id),
+  };
 };
 
 const getSupportedProtocols = () => [
@@ -57,6 +79,7 @@ const updateBookmark = async (bookmark: Bookmark) => {
     url: bookmark.url ?? "",
   });
   bookmark.isFavorite ? addFavorite(bookmark.id) : removeFavorite(bookmark.id);
+  bookmark.tags?.forEach((tag) => addTag(bookmark.id, tag));
   return result;
 };
 
@@ -66,7 +89,13 @@ const createBookmark = async (bookmark: Bookmark) => {
     url: bookmark.url,
   });
   if (bookmark.isFavorite) addFavorite(id);
-  return { id, title, url, isFavorite: bookmark.isFavorite };
+  return {
+    id,
+    title,
+    url,
+    isFavorite: bookmark.isFavorite,
+    tags: bookmark.tags,
+  };
 };
 
 const removeBookmark = async (bookmarkId: string) =>
@@ -93,6 +122,42 @@ const toggleFavorite = (bookmarkId: string) => {
   isFavorite(bookmarkId) ? removeFavorite(bookmarkId) : addFavorite(bookmarkId);
 };
 
+interface BookmarkTag {
+  bookmarkId: string;
+  tags: string[];
+}
+
+const tagsKey = "tags";
+const getAllTags = () =>
+  getBookmarkTags()
+    .flatMap((tag) => tag.tags)
+    .sort();
+
+const getBookmarkTags = (): BookmarkTag[] =>
+  JSON.parse(localStorage.getItem(tagsKey) ?? "[]") ?? [];
+const getTagsForBookmark = (bookmarkId: string) => {
+  const tags = getBookmarkTags();
+  const bookmarkTags = tags.find((tag) => tag.bookmarkId === bookmarkId);
+  return (bookmarkTags?.tags ?? []).sort();
+};
+const addTag = (bookmarkId: string, tag: string) => {
+  let tags = getBookmarkTags();
+  const tagsForBookmark = getTagsForBookmark(bookmarkId);
+  tags = tags.filter((tag) => tag.bookmarkId !== bookmarkId);
+  tagsForBookmark.push(tag);
+  tags.push({ bookmarkId: bookmarkId, tags: tagsForBookmark });
+  localStorage.setItem(tagsKey, JSON.stringify(tags));
+};
+
+const removeTag = (bookmarkId: string, tag: string) => {
+  let tags = getBookmarkTags();
+  let tagsForBookmark = getTagsForBookmark(bookmarkId);
+  tags = tags.filter((t) => t.bookmarkId !== bookmarkId);
+  tagsForBookmark = tagsForBookmark.filter((t) => t !== tag);
+  tags.push({ bookmarkId: bookmarkId, tags: tagsForBookmark });
+  localStorage.setItem(tagsKey, JSON.stringify(tags));
+};
+
 export const bookmarks = {
   getBookmarks,
   toggleFavorite,
@@ -101,6 +166,9 @@ export const bookmarks = {
   createBookmark,
   getSupportedProtocols,
   removeBookmark,
+  addTag,
+  removeTag,
+  getAllTags,
 };
 
 /**

@@ -52,11 +52,14 @@ const useBookmarkList = () => {
 
 const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
   const selectedBookmark = ref<Bookmark>();
-  const editBookmark = async (bookmarkId: string) =>
-    (selectedBookmark.value =
+  const editBookmark = async (bookmarkId: string) => {
+    selectedBookmark.value =
       bookmarkId === selectedBookmark.value?.id
         ? undefined
-        : await data.bookmarks.getBookmark(bookmarkId));
+        : await data.bookmarks.getBookmark(bookmarkId);
+    if (tagInput.value) tagInput.value.value = "";
+    getTagOptions();
+  };
 
   const supportedProtocols = ref<string[]>([]);
   onMounted(
@@ -106,6 +109,7 @@ const useBookmarkEditor = (getBookmarks: () => Promise<Bookmark[]>) => {
       title: "",
       url: "",
       isFavorite: false,
+      tags: [],
     });
 
   const confirmation = ref(false);
@@ -142,17 +146,34 @@ const {
   save,
 } = useBookmarkEditor(getBookmarks);
 
+const tagOptions = ref<string[]>([]);
+const getTagOptions = () => (tagOptions.value = data.bookmarks.getAllTags());
+
 const tagInput = ref<HTMLInputElement>();
-const tags = ref<string[]>([]);
-const addTag = () => {
+const addTag = async () => {
   const value = tagInput.value?.value.trim();
-  if (tagInput.value && value) {
-    if (!tags.value.some((tag) => tag === value)) tags.value.push(value);
+  if (tagInput.value) {
+    if (value && selectedBookmark.value) {
+      data.bookmarks.addTag(selectedBookmark.value.id, value);
+      selectedBookmark.value = await data.bookmarks.getBookmark(
+        selectedBookmark.value.id
+      );
+      await getBookmarks();
+      getTagOptions();
+    }
     tagInput.value.value = "";
   }
 };
-const removeTag = (tag: string) =>
-  (tags.value = tags.value.filter((t) => t !== tag));
+const removeTag = async (tag: string) => {
+  if (selectedBookmark.value) {
+    data.bookmarks.removeTag(selectedBookmark.value.id, tag);
+    selectedBookmark.value = await data.bookmarks.getBookmark(
+      selectedBookmark.value.id
+    );
+    await getBookmarks();
+    getTagOptions();
+  }
+};
 </script>
 
 <template>
@@ -171,7 +192,7 @@ const removeTag = (tag: string) =>
                 v-model="searchString"
                 autofocus
                 class="flex-1 rounded-lg mr-2 pl-2 dark:bg-gray-900"
-                placeholder="🔎 Search Bookmarks"
+                placeholder="🔎  Search Bookmarks"
                 @keydown.enter="go"
               />
               <div class="flex justify-center items-center space-x-2">
@@ -191,7 +212,7 @@ const removeTag = (tag: string) =>
               </div>
             </div>
 
-            <ul class="h-full overflow-y-scroll">
+            <ul v-if="bookmarks.length > 0" class="h-full overflow-y-scroll">
               <ListItem
                 v-for="bookmark in bookmarks"
                 :key="bookmark.id"
@@ -201,6 +222,9 @@ const removeTag = (tag: string) =>
                 @edit-clicked="editBookmark"
               />
             </ul>
+            <div v-else class="h-full flex justify-center items-center">
+              No bookmarks found
+            </div>
           </div>
           <div
             class="w-0 opacity-0 overflow-hidden break-words flex flex-col sm:border-l dark:border-gray-700 transition-[width,opacity] duration-[300ms] delay-[0ms]"
@@ -224,7 +248,7 @@ const removeTag = (tag: string) =>
                 {{ selectedBookmark.id ? `Edit` : `Add` }} Bookmark
               </h2>
               <div class="flex-1 flex flex-col overflow-hidden">
-                <div class="flex flex-col space-y-2 overflow-hidden">
+                <div class="flex flex-col space-y-2 overflow-hidden p-1">
                   <TextInput
                     v-model="selectedBookmark.title"
                     placeholder="Title"
@@ -241,46 +265,50 @@ const removeTag = (tag: string) =>
                         : FavoriteStatus.NotFavorite
                     }}
                   </button>
-                  <input
-                    ref="tagInput"
-                    list="tagSuggestions"
-                    class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
-                    placeholder="Add Tag"
-                    @keydown.enter="addTag"
-                  />
-                  <datalist id="tagSuggestions">
-                    <option v-for="tag in tags" :key="tag">{{ tag }}</option>
-                  </datalist>
-                  <div class="flex flex-row flex-wrap gap-2 overflow-y-auto">
-                    <div
-                      v-for="tag in tags"
-                      :key="tag"
-                      class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
-                    >
-                      {{ tag }}
-                      <button
-                        class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
-                        @click="removeTag(tag)"
+                  <template v-if="selectedBookmark.id">
+                    <input
+                      ref="tagInput"
+                      list="tagSuggestions"
+                      class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
+                      placeholder="Add Tag"
+                      @keydown.enter="addTag"
+                    />
+                    <datalist id="tagSuggestions">
+                      <option v-for="tag in tagOptions" :key="tag">
+                        {{ tag }}
+                      </option>
+                    </datalist>
+                    <div class="flex flex-row flex-wrap gap-2 overflow-y-auto">
+                      <div
+                        v-for="tag in selectedBookmark.tags"
+                        :key="tag"
+                        class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
                       >
-                        <svg
-                          class="h-2 w-2"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 8 8"
+                        {{ tag }}
+                        <button
+                          class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl p-1.5"
+                          @click="removeTag(tag)"
                         >
-                          <path
-                            stroke-linecap="round"
-                            stroke-width="1.5"
-                            d="M1 1l6 6m0-6L1 7"
-                          />
-                        </svg>
-                      </button>
+                          <svg
+                            class="h-2 w-2"
+                            stroke="currentColor"
+                            fill="none"
+                            viewBox="0 0 8 8"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-width="1.5"
+                              d="M1 1l6 6m0-6L1 7"
+                            />
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </template>
                   <p class="text-red-500 text-center">{{ error }}</p>
                 </div>
                 <div
-                  class="flex-1 flex flex-col justify-end items-end text-white space-y-2"
+                  class="flex-1 flex flex-col justify-end items-end text-white space-y-2 p-1"
                 >
                   <FormButton @click="save">Save</FormButton>
                   <FormButton

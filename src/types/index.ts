@@ -1,5 +1,6 @@
 export interface Bookmark extends browser.bookmarks.BookmarkTreeNode {
   isFavorite?: boolean;
+  tags?: string[];
 }
 
 export enum SortSetting {
