@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-// import { useRouter } from "vue-router";
 import { ThemeOption } from "./types";
-import * as data from "./data";
+import * as themeService from "./services/theme";
 
-// const { push } = useRouter();
-// onMounted(() => push({ name: "home" }));
-const theme = ref<ThemeOption>(ThemeOption.Light);
-onMounted(() => (theme.value = data.theme.getTheme()));
-const toggleTheme = () => (theme.value = data.theme.toggleTheme());
+const theme = ref<ThemeOption>();
+onMounted(() => (theme.value = themeService.getTheme()));
+const toggleTheme = () => (theme.value = themeService.toggleTheme());
 </script>
 
 <template>

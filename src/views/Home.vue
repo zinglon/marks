@@ -163,8 +163,10 @@ import IconButton from "../components/IconButton.vue";
 import ListItem from "../components/ListItem.vue";
 import { onMounted, Ref, ref, watch } from "vue";
 import { Bookmark, FavoriteStatus, SortSetting } from "../types";
-import { bookmarks as bookmarkData } from "../data";
-import { BookmarkDataAccessor } from "../data";
+import {
+  bookmarks as bookmarkData,
+  BookmarkDataAccessor,
+} from "../services/bookmarks";
 
 const selectedBookmark = ref<Bookmark>();
 
