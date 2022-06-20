@@ -2,6 +2,7 @@ import { Bookmark } from "../types";
 import * as favorites from "../services/favorites";
 import * as tags from "../services/tags";
 import * as bookmarksApi from "../data/bookmarks";
+import { byProperty } from "../utils/compare";
 
 const getSearchItems = (bookmark: Bookmark) =>
   [bookmark.title, bookmark.url, ...(bookmark.tags ?? [])].map((item) =>
@@ -22,26 +23,8 @@ const applyFilters = (bookmarks: Bookmark[], isFiltering: boolean) =>
     isFiltering ? favorites.isFavorite(bookmark.id) : true
   );
 
-type SortableProperty<T> = keyof {
-  [K in keyof T as T[K] extends string ? K : never]: T[K];
-};
-
-const sortAscending = (
-  a: Bookmark,
-  b: Bookmark,
-  by: SortableProperty<Bookmark>
-) => a[by].localeCompare(b[by]);
-
-const sortDescending = (
-  a: Bookmark,
-  b: Bookmark,
-  by: SortableProperty<Bookmark>
-) => b[by].localeCompare(a[by]);
-
 const applySort = (bookmarks: Bookmark[], isSorting: boolean) =>
-  [...bookmarks].sort((a, b) =>
-    isSorting ? sortDescending(a, b, "title") : sortAscending(a, b, "title")
-  );
+  [...bookmarks].sort(byProperty<Bookmark>("title", isSorting));
 
 const getBookmarks = async (
   search?: string,
