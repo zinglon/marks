@@ -6,16 +6,6 @@ export interface Bookmark {
   tags?: string[];
 }
 
-export enum SortSetting {
-  Ascending = "AZ↓",
-  Descending = "AZ↑",
-}
-
-export enum FavoriteStatus {
-  Favorite = "★",
-  NotFavorite = "☆",
-}
-
 export enum ThemeOption {
   Light = "light",
   Dark = "dark",
@@ -30,4 +20,17 @@ export interface LocalStorage {
   theme: ThemeOption;
   tags: BookmarkTag[];
   favorites: string[];
+}
+
+export enum Icon {
+  Pencil = "✎",
+  MagnifyingGlass = "🔎 ",
+  Star = "☼",
+  Moon = "☾",
+  X = "✕",
+  Ascending = "AZ↓",
+  Descending = "AZ↑",
+  Favorite = "★",
+  NotFavorite = "☆",
+  Add = "+",
 }

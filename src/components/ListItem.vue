@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Bookmark, FavoriteStatus } from "../types";
+import { Bookmark, Icon } from "../types";
 import IconButton from "./IconButton.vue";
 
 const props = defineProps<{ bookmark: Bookmark; isEditing: boolean }>();
@@ -33,17 +33,13 @@ defineEmits<{
       </template>
       <template v-else>
         <IconButton @click="$emit('favorite-clicked', bookmark.id)">
-          {{
-            bookmark.isFavorite
-              ? FavoriteStatus.Favorite
-              : FavoriteStatus.NotFavorite
-          }}
+          {{ bookmark.isFavorite ? Icon.Favorite : Icon.NotFavorite }}
         </IconButton>
         <IconButton
           v-if="!isEditing"
           @click="$emit('edit-clicked', bookmark.id)"
         >
-          ✎
+          {{ Icon.Pencil }}
         </IconButton>
       </template>
     </div>
