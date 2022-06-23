@@ -3,9 +3,15 @@ import { ThemeOption } from "./types";
 import * as themeService from "./services/theme";
 
 import TextInput from "./components/TextInput.vue";
+import Chip from "./components/Chip.vue";
+import ChipContainer from "./components/ChipContainer.vue";
 import FormButton from "./components/FormButton.vue";
 import IconButton from "./components/IconButton.vue";
 import ListItem from "./components/ListItem.vue";
+import Combobox from "./components/Combobox.vue";
+import ToggleInput from "./components/ToggleInput.vue";
+import Error from "./components/Error.vue";
+import FormGroup from "./layout/FormGroup.vue";
 import { onMounted, Ref, ref, watch } from "vue";
 import { Bookmark, Icon } from "./types";
 import {
@@ -135,17 +141,17 @@ const useBookmarkEditor = (
 };
 
 const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
+  const tagInput = ref<string>("");
   const tagOptions = ref<string[]>([]);
   const getTagOptions = () => (tagOptions.value = bookmarkData.getAllTags());
 
-  const tagInput = ref<HTMLInputElement>();
   const addTag = () => {
-    const value = tagInput.value?.value.trim();
-    if (tagInput.value && value && selectedBookmark.value) {
+    const value = tagInput.value?.trim();
+    if (value && selectedBookmark.value) {
       if (!selectedBookmark.value.tags) selectedBookmark.value.tags = [];
       if (!selectedBookmark.value.tags.includes(value))
         selectedBookmark.value.tags.push(value);
-      tagInput.value.value = "";
+      clearTagInput();
     }
   };
   const removeTag = (tag: string) => {
@@ -155,9 +161,7 @@ const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
       );
   };
 
-  const clearTagInput = () => {
-    if (tagInput.value) tagInput.value.value = "";
-  };
+  const clearTagInput = () => (tagInput.value = "");
   return {
     tagOptions,
     tagInput,
@@ -271,22 +275,25 @@ const { confirmation, error, editBookmark, addBookmark, remove, save } =
                   }"
                 >
                   <template v-if="confirmation">
-                    <div class="flex flex-col flex-1 text-center">
-                      Are you sure you want to remove this bookmark?
-                    </div>
-                    <div class="flex flex-col space-y-2 text-white">
-                      <FormButton @click="remove">Remove</FormButton>
-                      <FormButton @click="confirmation = !confirmation">
-                        Cancel
-                      </FormButton>
-                    </div>
+                    <FormGroup>
+                      <template #header>Remove Bookmark</template>
+                      <template #content>
+                        Are you sure you want to remove this bookmark?
+                      </template>
+                      <template #footer>
+                        <FormButton @click="remove">Remove</FormButton>
+                        <FormButton @click="confirmation = !confirmation">
+                          Cancel
+                        </FormButton>
+                      </template>
+                    </FormGroup>
                   </template>
                   <template v-else-if="selectedBookmark">
-                    <h2 class="text-center pb-4">
-                      {{ selectedBookmark.id ? `Edit` : `Add` }} Bookmark
-                    </h2>
-                    <div class="flex-1 flex flex-col overflow-hidden">
-                      <div class="flex flex-col space-y-2 overflow-hidden p-1">
+                    <FormGroup>
+                      <template #header>
+                        {{ selectedBookmark.id ? `Edit` : `Add` }} Bookmark
+                      </template>
+                      <template #content>
                         <TextInput
                           v-model="selectedBookmark.title"
                           placeholder="Title"
@@ -295,63 +302,48 @@ const { confirmation, error, editBookmark, addBookmark, remove, save } =
                           v-model="selectedBookmark.url"
                           placeholder="URL"
                         />
-                        <button
-                          class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 flex"
-                          @click="selectedBookmark!.isFavorite = !selectedBookmark?.isFavorite"
+                        <ToggleInput
+                          :label="'Favorite'"
+                          @toggle-clicked="
+                          selectedBookmark!.isFavorite =
+                            !selectedBookmark!.isFavorite
+                        "
                         >
-                          <div class="text-left flex-1">Favorite</div>
                           {{
                             selectedBookmark.isFavorite
                               ? Icon.Favorite
                               : Icon.NotFavorite
                           }}
-                        </button>
-                        <input
-                          ref="tagInput"
-                          list="tagSuggestions"
-                          class="rounded-lg border border-stone-300 dark:border-gray-700 p-2 dark:bg-gray-900"
-                          placeholder="Add Tag"
-                          @keydown.enter="addTag"
+                        </ToggleInput>
+                        <Combobox
+                          v-model="tagInput"
+                          :placeholder="'Add Tag'"
+                          :options="tagOptions"
+                          @add-tag="addTag"
                         />
-                        <datalist id="tagSuggestions">
-                          <option v-for="tag in tagOptions" :key="tag">
-                            {{ tag }}
-                          </option>
-                        </datalist>
-                        <div
-                          class="flex flex-row flex-wrap gap-2 overflow-y-auto"
-                        >
-                          <div
+                        <ChipContainer>
+                          <Chip
                             v-for="tag in selectedBookmark.tags"
                             :key="tag"
-                            class="bg-stone-700 dark:bg-gray-800 rounded-2xl p-2 text-white dark:text-gray-300 text-xs overflow-hidden"
-                          >
-                            {{ tag }}
-                            <button
-                              class="bg-stone-600 hover:bg-stone-500 dark:bg-gray-700 dark:hover:bg-gray-600 rounded-2xl w-5 h-5"
-                              @click="removeTag(tag)"
-                            >
-                              {{ Icon.X }}
-                            </button>
-                          </div>
-                        </div>
-                        <p class="text-red-500 text-center">{{ error }}</p>
-                      </div>
-                      <div
-                        class="flex-1 flex flex-col justify-end items-end text-white space-y-2 p-1"
-                      >
+                            :tag="tag"
+                            @remove-tag="removeTag"
+                          />
+                        </ChipContainer>
+                        <Error>{{ error }}</Error>
+                      </template>
+                      <template #footer>
                         <FormButton @click="save">Save</FormButton>
                         <FormButton
                           v-if="selectedBookmark.id"
                           @click="confirmation = true"
                         >
-                          Delete
+                          Remove
                         </FormButton>
                         <FormButton @click="selectedBookmark = undefined">
                           Cancel
                         </FormButton>
-                      </div>
-                    </div>
+                      </template>
+                    </FormGroup>
                   </template>
                 </div>
               </div>
