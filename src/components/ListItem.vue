@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Bookmark, Icon } from "../types";
 import IconButton from "./IconButton.vue";
+import IconButtonContainer from "./IconButtonContainer.vue";
 
 const props = defineProps<{ bookmark: Bookmark; isEditing: boolean }>();
 
@@ -22,7 +23,7 @@ defineEmits<{
       <h2>{{ props.bookmark.title }}</h2>
       <p>{{ props.bookmark.url }}</p>
     </a>
-    <div class="flex justify-center items-center space-x-2">
+    <IconButtonContainer>
       <template v-if="isEditing">
         <div
           class="py-2 px-3 select-none"
@@ -42,6 +43,6 @@ defineEmits<{
           {{ Icon.Pencil }}
         </IconButton>
       </template>
-    </div>
+    </IconButtonContainer>
   </li>
 </template>
