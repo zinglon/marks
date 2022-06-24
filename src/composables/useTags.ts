@@ -26,11 +26,11 @@ export const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
 
   const clearTagInput = () => (tagInput.value = "");
   return {
-    tagOptions,
-    tagInput,
     addTag,
-    removeTag,
-    getTagOptions,
     clearTagInput,
+    getTagOptions,
+    removeTag,
+    tagInput,
+    tagOptions,
   };
 };

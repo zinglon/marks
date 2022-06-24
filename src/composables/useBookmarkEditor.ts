@@ -64,20 +64,20 @@ export const useBookmarkEditor = (
   const addBookmark = () =>
     (selectedBookmark.value = {
       id: "",
-      title: "",
-      url: "",
       isFavorite: false,
       tags: [],
+      title: "",
+      url: "",
     });
 
   const confirmation = ref(false);
   return {
-    selectedBookmark,
-    editBookmark,
     addBookmark,
     confirmation,
-    remove,
+    editBookmark,
     error,
+    remove,
     save,
+    selectedBookmark,
   };
 };

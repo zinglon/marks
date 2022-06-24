@@ -34,14 +34,14 @@ export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
       window.location.href = bookmarks.value[0].url;
   };
   return {
-    searchString,
     bookmarks,
-    isSorting,
-    isFiltering,
     getBookmarks,
-    toggleSort,
-    toggleFilter,
-    toggleFavorite,
     go,
+    isFiltering,
+    isSorting,
+    searchString,
+    toggleFavorite,
+    toggleFilter,
+    toggleSort,
   };
 };

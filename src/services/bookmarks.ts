@@ -33,9 +33,9 @@ const getBookmarks = async (
 ) => {
   const bookmarkItems = (await bookmarksApi.getBookmarks()).map((bookmark) => ({
     ...bookmark,
-    title: bookmark.title ? bookmark.title : "[No Title]",
     isFavorite: favorites.isFavorite(bookmark.id),
     tags: tags.getTagsForBookmark(bookmark.id) ?? [],
+    title: bookmark.title ? bookmark.title : "[No Title]",
   }));
   const searchResults = applySearch(bookmarkItems, search);
   const filteredBookmarks = applyFilters(searchResults, !!isFiltering);
@@ -58,10 +58,10 @@ const createBookmark = async (bookmark: Bookmark) => {
   if (bookmark.tags) tags.setTags(id, bookmark.tags);
   return {
     id,
-    title,
-    url,
     isFavorite: bookmark.isFavorite,
     tags: bookmark.tags,
+    title,
+    url,
   };
 };
 
@@ -83,14 +83,14 @@ const removeBookmark = async (bookmarkId: string) => {
 const getSupportedProtocols = () => bookmarksApi.getSupportedProtocols();
 
 export const bookmarks = {
-  getBookmarks,
-  getBookmark,
   createBookmark,
-  updateBookmark,
-  removeBookmark,
-  getSupportedProtocols,
   getAllTags: tags.getAllTags,
+  getBookmark,
+  getBookmarks,
+  getSupportedProtocols,
+  removeBookmark,
   toggleFavorite: favorites.toggleFavorite,
+  updateBookmark,
 };
 
 export type BookmarkDataAccessor = typeof bookmarks;

@@ -8,5 +8,5 @@ export const useTheme = () => {
   onMounted(() => (selectedTheme.value = themeService.getTheme()));
   const toggleTheme = () => (selectedTheme.value = themeService.toggleTheme());
   const isDarkTheme = computed(() => selectedTheme.value === ThemeOption.Dark);
-  return { selectedTheme, toggleTheme, isDarkTheme };
+  return { isDarkTheme, selectedTheme, toggleTheme };
 };

@@ -1,8 +1,8 @@
 module.exports = {
   env: {
     browser: true,
-    node: true,
     es2021: true,
+    node: true,
   },
   extends: [
     "eslint:recommended",
@@ -11,14 +11,15 @@ module.exports = {
     "@vue/prettier",
     "@vue/prettier/@typescript-eslint",
   ],
-  plugins: ["vue", "html", "simple-import-sort"],
   globals: {
     defineProps: "readonly",
   },
+  plugins: ["vue", "html", "simple-import-sort", "sort-keys-fix"],
   rules: {
-    "vue/multi-word-component-names": "off",
     "no-undef": "off", // dom types don't work with this on
-    "simple-import-sort/imports": "error",
     "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": "error",
+    "sort-keys-fix/sort-keys-fix": "error",
+    "vue/multi-word-component-names": "off",
   },
 };
