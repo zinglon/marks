@@ -4,6 +4,12 @@ import { BookmarkDataAccessor } from "../services/bookmarks";
 import { Bookmark } from "../types";
 
 export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
+  const isSorting = ref(false);
+  const toggleSort = () => (isSorting.value = !isSorting.value);
+
+  const isFiltering = ref(false);
+  const toggleFilter = () => (isFiltering.value = !isFiltering.value);
+
   const searchString = ref<string>();
   const bookmarks = ref<Bookmark[]>([]);
   const getBookmarks = async () =>
@@ -14,12 +20,6 @@ export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
     ));
 
   onMounted(async () => await getBookmarks());
-
-  const isSorting = ref(false);
-  const toggleSort = () => (isSorting.value = !isSorting.value);
-
-  const isFiltering = ref(false);
-  const toggleFilter = () => (isFiltering.value = !isFiltering.value);
 
   watch(
     [searchString, isSorting, isFiltering],

@@ -21,8 +21,7 @@ export const useBookmarkEditor = (
 
   const supportedProtocols = ref<string[]>([]);
   onMounted(
-    async () =>
-      (supportedProtocols.value = bookmarkData.getSupportedProtocols())
+    () => (supportedProtocols.value = bookmarkData.getSupportedProtocols())
   );
 
   const hasError = (bookmark: Bookmark) =>
@@ -53,6 +52,7 @@ export const useBookmarkEditor = (
     await getBookmarks();
   };
 
+  const confirmation = ref(false);
   const remove = async () => {
     if (!selectedBookmark.value) return;
     await bookmarkData.removeBookmark(selectedBookmark.value.id);
@@ -70,7 +70,6 @@ export const useBookmarkEditor = (
       url: "",
     });
 
-  const confirmation = ref(false);
   return {
     addBookmark,
     confirmation,

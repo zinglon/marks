@@ -17,6 +17,8 @@ module.exports = {
   plugins: ["vue", "html", "simple-import-sort", "sort-keys-fix"],
   rules: {
     "no-undef": "off", // dom types don't work with this on
+    "no-use-before-define": "error",
+    "require-await": "error",
     "simple-import-sort/exports": "error",
     "simple-import-sort/imports": "error",
     "sort-keys-fix/sort-keys-fix": "error",

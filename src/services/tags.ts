@@ -1,11 +1,11 @@
 import { tags as tagsData } from "../data/tags";
 
+export const getBookmarkTags = () => tagsData.getTags();
+
 export const getAllTags = () =>
   getBookmarkTags()
     .flatMap((tag) => tag.tags)
     .sort();
-
-export const getBookmarkTags = () => tagsData.getTags();
 
 export const getTagsForBookmark = (bookmarkId: string) => {
   const tags = getBookmarkTags();

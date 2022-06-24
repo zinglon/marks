@@ -8,6 +8,8 @@ export const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
   const tagOptions = ref<string[]>([]);
   const getTagOptions = () => (tagOptions.value = bookmarkData.getAllTags());
 
+  const clearTagInput = () => (tagInput.value = "");
+
   const addTag = () => {
     const value = tagInput.value?.trim();
     if (value && selectedBookmark.value) {
@@ -24,7 +26,6 @@ export const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
       );
   };
 
-  const clearTagInput = () => (tagInput.value = "");
   return {
     addTag,
     clearTagInput,
