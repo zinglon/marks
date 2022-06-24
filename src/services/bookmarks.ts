@@ -1,7 +1,7 @@
-import { Bookmark } from "../types";
+import * as bookmarksApi from "../data/bookmarks";
 import * as favorites from "../services/favorites";
 import * as tags from "../services/tags";
-import * as bookmarksApi from "../data/bookmarks";
+import { Bookmark } from "../types";
 import { byProperty } from "../utils/compare";
 
 const getSearchItems = (bookmark: Bookmark) =>

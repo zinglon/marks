@@ -1,5 +1,5 @@
-import { BookmarkTag, LocalStorage } from "../types";
 import useLocalStorage from "../lib/useLocalStorage";
+import { BookmarkTag, LocalStorage } from "../types";
 
 const { getValue, setValue } = useLocalStorage<LocalStorage>();
 

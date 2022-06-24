@@ -1,4 +1,5 @@
 import { onMounted, ref, watch } from "vue";
+
 import { BookmarkDataAccessor } from "../services/bookmarks";
 import { Bookmark } from "../types";
 

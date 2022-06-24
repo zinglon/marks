@@ -1,6 +1,7 @@
-import { ThemeOption } from "../types";
+import { computed, onMounted, ref } from "vue";
+
 import * as themeService from "../services/theme";
-import { ref, onMounted, computed } from "vue";
+import { ThemeOption } from "../types";
 
 export const useTheme = () => {
   const selectedTheme = ref<ThemeOption>();

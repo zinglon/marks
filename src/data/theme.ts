@@ -1,5 +1,5 @@
-import { ThemeOption, LocalStorage } from "../types";
 import useLocalStorage from "../lib/useLocalStorage";
+import { LocalStorage, ThemeOption } from "../types";
 
 const { getValue, setValue } = useLocalStorage<LocalStorage>();
 

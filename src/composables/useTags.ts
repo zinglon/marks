@@ -1,4 +1,5 @@
 import { Ref, ref } from "vue";
+
 import { bookmarks as bookmarkData } from "../services/bookmarks";
 import { Bookmark } from "../types";
 

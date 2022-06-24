@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ThemeOption, Icon } from "../types";
+import { Icon, ThemeOption } from "../types";
 defineProps<{
   theme: {
     selectedTheme?: ThemeOption;

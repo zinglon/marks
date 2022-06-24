@@ -1,27 +1,28 @@
 <script setup lang="ts">
-import CommandPalette from "./components/CommandPalette.vue";
-import SiteLayout from "./components/SiteLayout.vue";
-import ThemeToggle from "./components/ThemeToggle.vue";
-import TextInput from "./components/TextInput.vue";
+import { ref } from "vue";
+
 import Chip from "./components/Chip.vue";
 import ChipContainer from "./components/ChipContainer.vue";
-import FormButton from "./components/FormButton.vue";
-import IconButton from "./components/IconButton.vue";
-import ListItem from "./components/ListItem.vue";
 import Combobox from "./components/Combobox.vue";
-import ToggleInput from "./components/ToggleInput.vue";
-import Error from "./components/Error.vue";
-import List from "./components/List.vue";
+import CommandPalette from "./components/CommandPalette.vue";
 import CommandPaletteControls from "./components/CommandPaletteControls.vue";
-import SearchInput from "./components/SearchInput.vue";
-import IconButtonContainer from "./components/IconButtonContainer.vue";
+import Error from "./components/Error.vue";
+import FormButton from "./components/FormButton.vue";
 import FormGroup from "./components/FormGroup.vue";
-import { ref } from "vue";
-import { Bookmark, Icon } from "./types";
-import { bookmarks as bookmarkData } from "./services/bookmarks";
-import { useBookmarkList } from "./composables/useBookmarkList";
+import IconButton from "./components/IconButton.vue";
+import IconButtonContainer from "./components/IconButtonContainer.vue";
+import List from "./components/List.vue";
+import ListItem from "./components/ListItem.vue";
+import SearchInput from "./components/SearchInput.vue";
+import SiteLayout from "./components/SiteLayout.vue";
+import TextInput from "./components/TextInput.vue";
+import ThemeToggle from "./components/ThemeToggle.vue";
+import ToggleInput from "./components/ToggleInput.vue";
 import { useBookmarkEditor } from "./composables/useBookmarkEditor";
+import { useBookmarkList } from "./composables/useBookmarkList";
 import { useTags } from "./composables/useTags";
+import { bookmarks as bookmarkData } from "./services/bookmarks";
+import { Bookmark, Icon } from "./types";
 
 const selectedBookmark = ref<Bookmark>();
 

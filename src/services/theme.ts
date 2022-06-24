@@ -1,6 +1,5 @@
-import { ThemeOption } from "../types";
-
 import { theme } from "../data/theme";
+import { ThemeOption } from "../types";
 
 const getThemeOrDefault = () => theme.getTheme() ?? ThemeOption.Light;
 

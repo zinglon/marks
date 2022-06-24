@@ -11,12 +11,14 @@ module.exports = {
     "@vue/prettier",
     "@vue/prettier/@typescript-eslint",
   ],
-  plugins: ["vue", "html"],
+  plugins: ["vue", "html", "simple-import-sort"],
   globals: {
     defineProps: "readonly",
   },
   rules: {
     "vue/multi-word-component-names": "off",
     "no-undef": "off", // dom types don't work with this on
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
   },
 };
