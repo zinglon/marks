@@ -1,11 +1,11 @@
 import { onMounted, Ref, ref, watch } from "vue";
 
-import { BookmarkDataAccessor } from "../services/bookmarks";
+import { BookmarkService } from "../services/bookmark";
 import { Bookmark } from "../types";
 import { assertIsDefined } from "../utils/assertIsDefined";
 
 export const useBookmarkEditor = (
-  bookmarkData: BookmarkDataAccessor,
+  bookmarkService: BookmarkService,
   selectedBookmark: Ref<Bookmark | undefined>,
   getBookmarks: () => Promise<Bookmark[]>,
   getTagOptions: () => string[],
@@ -15,14 +15,14 @@ export const useBookmarkEditor = (
     selectedBookmark.value =
       bookmarkId === selectedBookmark.value?.id
         ? undefined
-        : await bookmarkData.getBookmark(bookmarkId);
+        : await bookmarkService.getBookmark(bookmarkId);
     clearTagInput();
     getTagOptions();
   };
 
   const supportedProtocols = ref<string[]>([]);
   onMounted(
-    () => (supportedProtocols.value = bookmarkData.getSupportedProtocols())
+    () => (supportedProtocols.value = bookmarkService.getSupportedProtocols())
   );
 
   const hasError = (bookmark: Bookmark) =>
@@ -41,9 +41,9 @@ export const useBookmarkEditor = (
     if (!error.value) {
       try {
         if (selectedBookmark.value.id)
-          await bookmarkData.updateBookmark(selectedBookmark.value);
+          await bookmarkService.updateBookmark(selectedBookmark.value);
         else
-          selectedBookmark.value = await bookmarkData.createBookmark(
+          selectedBookmark.value = await bookmarkService.createBookmark(
             selectedBookmark.value
           );
       } catch (err) {
@@ -56,7 +56,7 @@ export const useBookmarkEditor = (
   const confirmation = ref(false);
   const remove = async () => {
     assertIsDefined(selectedBookmark.value);
-    await bookmarkData.removeBookmark(selectedBookmark.value.id);
+    await bookmarkService.removeBookmark(selectedBookmark.value.id);
     selectedBookmark.value = undefined;
     confirmation.value = false;
     await getBookmarks();

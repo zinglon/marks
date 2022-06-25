@@ -20,8 +20,8 @@ import ThemeToggle from "./components/ThemeToggle.vue";
 import ToggleInput from "./components/ToggleInput.vue";
 import { useBookmarkEditor } from "./composables/useBookmarkEditor";
 import { useBookmarkList } from "./composables/useBookmarkList";
-import { useTags } from "./composables/useTags";
-import { bookmarks as bookmarkData } from "./services/bookmarks";
+import { useTag } from "./composables/useTag";
+import { bookmarkService } from "./services/bookmark";
 import { Bookmark, Icon } from "./types";
 
 const selectedBookmark = ref<Bookmark>();
@@ -36,7 +36,7 @@ const {
   toggleFilter,
   toggleFavorite,
   go,
-} = useBookmarkList(bookmarkData);
+} = useBookmarkList(bookmarkService);
 
 const {
   tagOptions,
@@ -45,11 +45,11 @@ const {
   removeTag,
   getTagOptions,
   clearTagInput,
-} = useTags(selectedBookmark);
+} = useTag(bookmarkService, selectedBookmark);
 
 const { confirmation, error, editBookmark, addBookmark, remove, save } =
   useBookmarkEditor(
-    bookmarkData,
+    bookmarkService,
     selectedBookmark,
     getBookmarks,
     getTagOptions,

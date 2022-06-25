@@ -5,4 +5,6 @@ const { getValue, setValue } = useLocalStorage<LocalStorage>();
 
 const getTags = () => getValue("tags") ?? [];
 const setTags = (tags: BookmarkTag[]) => setValue("tags", tags);
-export const tags = { getTags, setTags };
+
+export const tagData = { getTags, setTags };
+export type TagData = typeof tagData;

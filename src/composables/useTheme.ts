@@ -1,9 +1,9 @@
 import { computed, onMounted, ref } from "vue";
 
-import * as themeService from "../services/theme";
+import { ThemeService } from "../services/theme";
 import { ThemeOption } from "../types";
 
-export const useTheme = () => {
+export const useTheme = (themeService: ThemeService) => {
   const selectedTheme = ref<ThemeOption>();
   onMounted(() => (selectedTheme.value = themeService.getTheme()));
   const toggleTheme = () => (selectedTheme.value = themeService.toggleTheme());

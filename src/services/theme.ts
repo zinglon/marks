@@ -1,15 +1,23 @@
-import { theme } from "../data/theme";
+import { ThemeData, themeData } from "../data/theme";
 import { ThemeOption } from "../types";
 
-const getThemeOrDefault = () => theme.getTheme() ?? ThemeOption.Light;
+export const createThemeService = (themeData: ThemeData) => {
+  const getThemeOrDefault = () => themeData.getTheme() ?? ThemeOption.Light;
+  const toggleTheme = () => {
+    const newTheme =
+      getThemeOrDefault() === ThemeOption.Light
+        ? ThemeOption.Dark
+        : ThemeOption.Light;
+    themeData.setTheme(newTheme);
+    return newTheme;
+  };
 
-export const toggleTheme = () => {
-  const newTheme =
-    getThemeOrDefault() === ThemeOption.Light
-      ? ThemeOption.Dark
-      : ThemeOption.Light;
-  theme.setTheme(newTheme);
-  return newTheme;
+  const getTheme = () => getThemeOrDefault();
+  return {
+    getTheme,
+    toggleTheme,
+  };
 };
 
-export const getTheme = () => getThemeOrDefault();
+export const themeService = createThemeService(themeData);
+export type ThemeService = typeof themeService;

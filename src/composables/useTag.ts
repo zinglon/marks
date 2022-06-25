@@ -1,13 +1,16 @@
 import { Ref, ref } from "vue";
 
-import { bookmarks as bookmarkData } from "../services/bookmarks";
+import { BookmarkService } from "../services/bookmark";
 import { Bookmark } from "../types";
 import { assertIsDefined } from "../utils/assertIsDefined";
 
-export const useTags = (selectedBookmark: Ref<Bookmark | undefined>) => {
+export const useTag = (
+  bookmarkService: BookmarkService,
+  selectedBookmark: Ref<Bookmark | undefined>
+) => {
   const tagInput = ref<string>("");
   const tagOptions = ref<string[]>([]);
-  const getTagOptions = () => (tagOptions.value = bookmarkData.getAllTags());
+  const getTagOptions = () => (tagOptions.value = bookmarkService.getAllTags());
 
   const clearTagInput = () => (tagInput.value = "");
 

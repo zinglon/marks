@@ -1,9 +1,9 @@
 import { onMounted, ref, watch } from "vue";
 
-import { BookmarkDataAccessor } from "../services/bookmarks";
+import { BookmarkService } from "../services/bookmark";
 import { Bookmark } from "../types";
 
-export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
+export const useBookmarkList = (bookmarkService: BookmarkService) => {
   const isSorting = ref(false);
   const toggleSort = () => (isSorting.value = !isSorting.value);
 
@@ -13,7 +13,7 @@ export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
   const searchString = ref<string>();
   const bookmarks = ref<Bookmark[]>([]);
   const getBookmarks = async () =>
-    (bookmarks.value = await bookmarkData.getBookmarks(
+    (bookmarks.value = await bookmarkService.getBookmarks(
       searchString.value,
       isSorting.value,
       isFiltering.value
@@ -26,7 +26,7 @@ export const useBookmarkList = (bookmarkData: BookmarkDataAccessor) => {
     async () => await getBookmarks()
   );
   const toggleFavorite = async (bookmarkId: string) => {
-    bookmarkData.toggleFavorite(bookmarkId);
+    bookmarkService.toggleFavorite(bookmarkId);
     await getBookmarks();
   };
   const go = () => {

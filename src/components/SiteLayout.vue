@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useTheme } from "../composables/useTheme";
+import { themeService } from "../services/theme";
 
-const { toggleTheme, isDarkTheme } = useTheme();
+const { toggleTheme, isDarkTheme } = useTheme(themeService);
 </script>
 <template>
   <div class="h-screen" :class="{ dark: isDarkTheme }">

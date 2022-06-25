@@ -5,4 +5,6 @@ const { getValue, setValue } = useLocalStorage<LocalStorage>();
 
 const getTheme = () => getValue("theme");
 const setTheme = (theme: ThemeOption) => setValue("theme", theme);
-export const theme = { getTheme, setTheme };
+
+export const themeData = { getTheme, setTheme };
+export type ThemeData = typeof themeData;
