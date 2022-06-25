@@ -2,7 +2,6 @@
 import { Icon, ThemeOption } from "../types";
 defineProps<{
   theme: {
-    selectedTheme?: ThemeOption;
     toggleTheme: () => ThemeOption;
     isDarkTheme: boolean;
   };
