@@ -29,7 +29,7 @@ export const createBookmarkService = (
     );
 
   const applySort = (bookmarks: Bookmark[], isSorting: boolean) =>
-    [...bookmarks].sort(byProperty<Bookmark>("title", isSorting));
+    [...bookmarks].sort(byProperty("title", isSorting));
 
   const getBookmarks = async (
     search?: string,
@@ -107,3 +107,434 @@ export const bookmarkService = createBookmarkService(
   favoriteService
 );
 export type BookmarkService = typeof bookmarkService;
+
+if (import.meta.vitest) {
+  const { describe, expect, it, vi } = import.meta.vitest;
+  describe("createBookmarkService", () => {
+    describe("createBookmark", () => {
+      it("creates a bookmark for the provided bookmark data and returns the result", async () => {
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn(),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmark = {
+          isFavorite: true,
+          tags: ["test", "bookmark"],
+          title: "Test Bookmark",
+          url: "https://example.com",
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn().mockReturnValue({ ...bookmark, id: "1" }),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.createBookmark(bookmark);
+        expect(bookmarkData.createBookmark).toHaveBeenCalledWith(bookmark);
+        expect(favoriteService.addFavorite).toHaveBeenCalledWith(result.id);
+        expect(tagService.setTags).toHaveBeenCalledWith(
+          result.id,
+          bookmark.tags
+        );
+        expect(result).toEqual({ ...bookmark, id: "1" });
+      });
+    });
+    describe("getBookmark", () => {
+      it("returns the bookmark for the provided bookmark id", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["test", "bookmark"],
+          title: "Test Bookmark",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn().mockReturnValue(bookmark.tags),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn().mockReturnValue({
+            id: bookmark.id,
+            title: bookmark.title,
+            url: bookmark.url,
+          }),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmark(bookmark.id);
+        expect(result).toEqual(bookmark);
+      });
+    });
+    describe("getBookmarks", () => {
+      it("returns bookmarks that match on url", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["tag"],
+          title: "Title",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn().mockReturnValue(bookmark.tags),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn().mockReturnValue([bookmark]),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmarks("exa");
+        expect(result).toEqual([bookmark]);
+      });
+      it("returns bookmarks that match on tag", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["tag"],
+          title: "Title",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn().mockReturnValue(bookmark.tags),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn().mockReturnValue([bookmark]),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmarks("ta");
+        expect(result).toEqual([bookmark]);
+      });
+      it("returns bookmarks that match on title", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["tag"],
+          title: "Title",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn().mockReturnValue(bookmark.tags),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn().mockReturnValue([bookmark]),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmarks("tit");
+        expect(result).toEqual([bookmark]);
+      });
+      it("applies sort", async () => {
+        const bookmark1 = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "A",
+          url: "https://example.com",
+        };
+        const bookmark2 = {
+          id: "2",
+          isFavorite: false,
+          tags: [],
+          title: "Z",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(false),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn().mockReturnValue([bookmark1, bookmark2]),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmarks(undefined, true);
+        expect(result).toEqual([bookmark2, bookmark1]);
+      });
+      it("applies filter", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "A",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn().mockReturnValue([bookmark]),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = await bookmarkService.getBookmarks(
+          undefined,
+          undefined,
+          true
+        );
+        expect(result).toEqual([]);
+      });
+    });
+    describe("getSupportedProtocols", () => {
+      it("returns supported protocols", () => {
+        const supportProtocols = ["https", "http"];
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn(),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(supportProtocols),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        const result = bookmarkService.getSupportedProtocols();
+        expect(result).toEqual(supportProtocols);
+      });
+    });
+    describe("removeBookmark", () => {
+      it("removes bookmark and corresponding favorite and tag data", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["tag"],
+          title: "Title",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn(),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        await bookmarkService.removeBookmark(bookmark.id);
+        expect(bookmarkData.removeBookmark).toHaveBeenCalledWith(bookmark.id);
+        expect(favoriteService.removeFavorite).toHaveBeenCalledWith(
+          bookmark.id
+        );
+        expect(tagService.setTags).toHaveBeenCalledWith(bookmark.id);
+      });
+    });
+    describe("updateBookmark", () => {
+      it("updates bookmark and corresponding favorite and tag data", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: true,
+          tags: ["tag"],
+          title: "Title",
+          url: "https://example.com",
+        };
+
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn().mockReturnValue(bookmark.tags),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn().mockReturnValue(bookmark.isFavorite),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn().mockReturnValue(bookmark),
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService
+        );
+
+        await bookmarkService.updateBookmark(bookmark);
+        expect(bookmarkData.updateBookmark).toHaveBeenCalledWith(bookmark);
+        expect(favoriteService.addFavorite).toHaveBeenCalledWith(bookmark.id);
+        expect(tagService.setTags).toHaveBeenCalledWith(
+          bookmark.id,
+          bookmark.tags
+        );
+      });
+    });
+  });
+}

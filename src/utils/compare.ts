@@ -12,3 +12,56 @@ export const byProperty =
   (a: T, b: T) =>
     compare(AssertType<string>(a[prop]), AssertType<string>(b[prop])) *
     (reverse ? -1 : 1);
+
+if (import.meta.vitest) {
+  const { describe, expect, it } = import.meta.vitest;
+  describe("byProperty", () => {
+    it("returns a positive number if the second parameter comes before the first", () => {
+      const sorted = byProperty<{ name: string }>("name")(
+        { name: "John" },
+        { name: "Jane" }
+      );
+      expect(sorted).toEqual(1);
+    });
+    it("returns a negative number if the first parameter comes before the second", () => {
+      const sorted = byProperty<{ name: string }>("name")(
+        { name: "Jane" },
+        { name: "John" }
+      );
+      expect(sorted).toEqual(-1);
+    });
+    it("returns 0 if the parameters are the same", () => {
+      const sorted = byProperty<{ name: string }>("name")(
+        { name: "Jane" },
+        { name: "Jane" }
+      );
+      expect(sorted).toEqual(0);
+    });
+    it("returns a negative number if the second parameter comes before the first and is in reverse", () => {
+      const sorted = byProperty<{ name: string }>("name", true)(
+        { name: "John" },
+        { name: "Jane" }
+      );
+      expect(sorted).toEqual(-1);
+    });
+    it("returns a positive number if the first parameter comes before the second and is in reverse", () => {
+      const sorted = byProperty<{ name: string }>("name", true)(
+        { name: "Jane" },
+        { name: "John" }
+      );
+      expect(sorted).toEqual(1);
+    });
+    it("works with sort", () => {
+      type Person = { name: string };
+      const people: Person[] = [{ name: "John" }, { name: "Jane" }];
+      const sorted = people.sort(byProperty<Person>("name"));
+      expect(sorted).toEqual([{ name: "Jane" }, { name: "John" }]);
+    });
+    it("works with sort in reverse", () => {
+      type Person = { name: string };
+      const people: Person[] = [{ name: "Jane" }, { name: "John" }];
+      const sorted = people.sort(byProperty<Person>("name", true));
+      expect(sorted).toEqual([{ name: "John" }, { name: "Jane" }]);
+    });
+  });
+}

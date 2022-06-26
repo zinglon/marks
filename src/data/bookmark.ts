@@ -56,5 +56,12 @@ export const createBookmarkDataAccessor = (
   };
 };
 
-export const bookmarkData = createBookmarkDataAccessor(browser.bookmarks);
+// TODO: figure out how to make vitest play nice with browser.bookmarks
+// eslint-disable-next-line
+export const bookmarkData = (
+  import.meta.env.MODE !== "test"
+    ? createBookmarkDataAccessor(browser.bookmarks)
+    : undefined
+)!;
+
 export type BookmarkData = typeof bookmarkData;

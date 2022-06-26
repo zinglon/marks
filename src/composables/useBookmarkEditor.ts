@@ -1,8 +1,9 @@
-import { onMounted, Ref, ref, watch } from "vue";
+import { nextTick, onMounted, Ref, ref, watch } from "vue";
 
 import { BookmarkService } from "../services/bookmark";
 import { Bookmark } from "../types";
 import { assertIsDefined } from "../utils/assertIsDefined";
+import { withSetup } from "../utils/testHelpers";
 
 export const useBookmarkEditor = (
   bookmarkService: BookmarkService,
@@ -81,3 +82,336 @@ export const useBookmarkEditor = (
     selectedBookmark,
   };
 };
+
+if (import.meta.vitest) {
+  const { describe, expect, it, vi } = import.meta.vitest;
+  describe("useBookmarkEditor", () => {
+    it("clears error if selectedBookmark changes", async () => {
+      const bookmarkService: BookmarkService = {
+        createBookmark: vi.fn(),
+        getAllTags: vi.fn(),
+        getBookmark: vi.fn(),
+        getBookmarks: vi.fn(),
+        getSupportedProtocols: vi.fn(),
+        removeBookmark: vi.fn(),
+        toggleFavorite: vi.fn(),
+        updateBookmark: vi.fn(),
+      };
+
+      const selectedBookmark = ref<Bookmark>({
+        id: "1",
+        isFavorite: false,
+        tags: [],
+        title: "Title",
+        url: "https://www.example.com",
+      });
+      const { composable } = withSetup(() =>
+        useBookmarkEditor(
+          bookmarkService,
+          selectedBookmark,
+          vi.fn(),
+          vi.fn(),
+          vi.fn()
+        )
+      );
+      composable.error.value = "error";
+      assertIsDefined(composable.selectedBookmark.value);
+      composable.selectedBookmark.value.title = "Title2";
+      await nextTick();
+      expect(composable.error.value).toEqual(undefined);
+    });
+    describe("addBookmark", () => {
+      it("populates selectedBookmark", () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const selectedBookmark = ref<Bookmark>();
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        composable.addBookmark();
+        expect(selectedBookmark.value).toEqual({
+          id: "",
+          isFavorite: false,
+          tags: [],
+          title: "",
+          url: "",
+        });
+      });
+    });
+    describe("editBookmark", () => {
+      it("unsets selectedBookmark if it is set", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const selectedBookmark = ref<Bookmark>({
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        });
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+
+        await composable.editBookmark("1");
+        expect(selectedBookmark.value).toBeUndefined();
+      });
+      it("sets the selectedBookmark if it is not currently set", async () => {
+        const bookmark = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        };
+
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn().mockReturnValue(bookmark),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const selectedBookmark = ref<Bookmark>();
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+
+        await composable.editBookmark("1");
+        expect(selectedBookmark.value).toEqual(bookmark);
+      });
+      it("calls clearTagInput", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const selectedBookmark = ref<Bookmark>();
+        const clearTagInput = vi.fn();
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            clearTagInput
+          )
+        );
+
+        await composable.editBookmark("1");
+        expect(clearTagInput).toHaveBeenCalled();
+      });
+      it("calls getTagOptions", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const selectedBookmark = ref<Bookmark>();
+        const getTagOptions = vi.fn();
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            getTagOptions,
+            vi.fn()
+          )
+        );
+
+        await composable.editBookmark("1");
+        expect(getTagOptions).toHaveBeenCalled();
+      });
+    });
+    describe("remove", () => {
+      it("calls remove bookmark, resets selectedBookmark, resets confirmation, and gets latest bookmarks", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const getBookmarks = vi.fn();
+        const bookmark = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        };
+        const selectedBookmark = ref<Bookmark>();
+        selectedBookmark.value = bookmark;
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            getBookmarks,
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        await composable.remove();
+        expect(bookmarkService.removeBookmark).toHaveBeenCalledWith(
+          bookmark.id
+        );
+        expect(selectedBookmark.value).toBeUndefined();
+        expect(composable.confirmation.value).toBe(false);
+        expect(getBookmarks).toHaveBeenCalled();
+      });
+    });
+    describe("save", () => {
+      it("sets error if the bookmark fails validation", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(["https"]),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const bookmark = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "bad://www.example.com",
+        };
+        const selectedBookmark = ref<Bookmark>();
+        selectedBookmark.value = bookmark;
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        await composable.save();
+        expect(composable.error.value).toBeDefined();
+      });
+      it("calls update bookmark if the bookmark already exists", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(["https"]),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const bookmark = {
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        };
+        const selectedBookmark = ref<Bookmark>();
+        selectedBookmark.value = bookmark;
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        await composable.save();
+        expect(bookmarkService.updateBookmark).toHaveBeenCalled();
+      });
+      it("calls create bookmark if it is a new bookmark", async () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(["https"]),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const bookmark = {
+          id: "",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        };
+        const selectedBookmark = ref<Bookmark>();
+        selectedBookmark.value = bookmark;
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        await composable.save();
+        expect(bookmarkService.createBookmark).toHaveBeenCalled();
+      });
+    });
+  });
+}
