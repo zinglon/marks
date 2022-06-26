@@ -1,7 +1,7 @@
 import { BookmarkData, bookmarkData } from "../data/bookmark";
 import { FavoriteService, favoriteService } from "../services/favorite";
 import { TagService, tagService } from "../services/tag";
-import { Bookmark } from "../types";
+import { Bookmark, NewBookmark } from "../types";
 import { byProperty } from "../utils/compare";
 
 export const createBookmarkService = (
@@ -59,7 +59,7 @@ export const createBookmarkService = (
     };
   };
 
-  const createBookmark = async (bookmark: Bookmark) => {
+  const createBookmark = async (bookmark: NewBookmark) => {
     const { id, title, url } = await bookmarkData.createBookmark(bookmark);
     if (bookmark.isFavorite) favoriteService.addFavorite(id);
     if (bookmark.tags) tagService.setTags(id, bookmark.tags);

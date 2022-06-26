@@ -6,6 +6,13 @@ export interface Bookmark {
   tags?: string[];
 }
 
+export interface NewBookmark {
+  title: string;
+  url: string;
+  isFavorite?: boolean;
+  tags?: string[];
+}
+
 export enum ThemeOption {
   Light = "light",
   Dark = "dark",

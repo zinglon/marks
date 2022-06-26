@@ -54,5 +54,43 @@ if (import.meta.vitest) {
         expect(tagService.getAllTags()).toEqual(["a", "b", "c", "d"]);
       });
     });
+    describe("getTagsForBookmark", () => {
+      it("gets sorted tags for the provided bookmarkId", () => {
+        const bookmarkTags = [
+          {
+            bookmarkId: "1",
+            tags: ["b", "a"],
+          },
+        ];
+        const tagData: TagData = {
+          getTags: vi.fn().mockReturnValue(bookmarkTags),
+          setTags: vi.fn(),
+        };
+        const tagService = createTagService(tagData);
+        expect(tagService.getTagsForBookmark("1")).toEqual(["a", "b"]);
+      });
+    });
+    describe("setTags", () => {
+      it("sets tags for the provided bookmarkId", () => {
+        const bookmarkTags = [
+          {
+            bookmarkId: "1",
+            tags: ["b", "a"],
+          },
+        ];
+        const tagData: TagData = {
+          getTags: vi.fn().mockReturnValue(bookmarkTags),
+          setTags: vi.fn(),
+        };
+        const tagService = createTagService(tagData);
+        tagService.setTags("1", ["c", "d"]);
+        expect(tagData.setTags).toHaveBeenCalledWith([
+          {
+            bookmarkId: "1",
+            tags: ["c", "d"],
+          },
+        ]);
+      });
+    });
   });
 }

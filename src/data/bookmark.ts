@@ -1,4 +1,4 @@
-import { Bookmark } from "../types";
+import { Bookmark, NewBookmark } from "../types";
 
 export const createBookmarkDataAccessor = (
   bookmarkApi: typeof browser.bookmarks
@@ -18,7 +18,7 @@ export const createBookmarkDataAccessor = (
       })
     );
 
-  const createBookmark = async (bookmark: Bookmark) =>
+  const createBookmark = async (bookmark: NewBookmark) =>
     mapApiBookmarkToBookmark(
       await bookmarkApi.create({
         title: bookmark.title,
