@@ -10,7 +10,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "lib": ["esnext", "dom"],
-    "typeRoots": ["node_modules/@types", "node_modules/web-ext-types"]
+    "types": ["vitest/importMeta", "web-ext-types"]
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue", "plugins/**/*.ts"]
 }

@@ -30,3 +30,29 @@ export const createTagService = (tagData: TagData) => {
 
 export const tagService = createTagService(tagData);
 export type TagService = typeof tagService;
+
+if (import.meta.vitest) {
+  const { describe, expect, it, vi } = import.meta.vitest;
+  describe("createTagService", () => {
+    describe("getAllTags", () => {
+      it("gets sorted array of all tags for all bookmarks", () => {
+        const bookmarkTags = [
+          {
+            bookmarkId: "1",
+            tags: ["a", "b"],
+          },
+          {
+            bookmarkId: "2",
+            tags: ["d", "c"],
+          },
+        ];
+        const tagData: TagData = {
+          getTags: vi.fn().mockReturnValue(bookmarkTags),
+          setTags: vi.fn(),
+        };
+        const tagService = createTagService(tagData);
+        expect(tagService.getAllTags()).toEqual(["a", "b", "c", "d"]);
+      });
+    });
+  });
+}
