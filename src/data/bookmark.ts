@@ -57,6 +57,7 @@ export const createBookmarkDataAccessor = (
 };
 
 // TODO: figure out how to make vitest play nice with browser.bookmarks
+// maybe look at https://vitest.dev/guide/mocking.html#globals
 // eslint-disable-next-line
 export const bookmarkData = (
   import.meta.env.MODE !== "test"

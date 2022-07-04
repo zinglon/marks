@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
-
 import Chip from "./components/Chip.vue";
 import ChipContainer from "./components/ChipContainer.vue";
 import Combobox from "./components/Combobox.vue";
@@ -18,15 +16,16 @@ import SiteLayout from "./components/SiteLayout.vue";
 import TextInput from "./components/TextInput.vue";
 import ThemeToggle from "./components/ThemeToggle.vue";
 import ToggleInput from "./components/ToggleInput.vue";
+import { useApp } from "./composables/useApp";
 import { useBookmarkEditor } from "./composables/useBookmarkEditor";
 import { useBookmarkList } from "./composables/useBookmarkList";
 import { useTag } from "./composables/useTag";
 import { useTheme } from "./composables/useTheme";
 import { bookmarkService } from "./services/bookmark";
 import { themeService } from "./services/theme";
-import { Bookmark, Icon } from "./types";
+import { Icon } from "./types";
 
-const selectedBookmark = ref<Bookmark>();
+const { selectedBookmark } = useApp();
 
 const {
   searchString,
@@ -49,14 +48,22 @@ const {
   clearTagInput,
 } = useTag(bookmarkService, selectedBookmark);
 
-const { confirmation, error, editBookmark, addBookmark, remove, save } =
-  useBookmarkEditor(
-    bookmarkService,
-    selectedBookmark,
-    getBookmarks,
-    getTagOptions,
-    clearTagInput
-  );
+const {
+  confirmation,
+  error,
+  editBookmark,
+  addBookmark,
+  remove,
+  save,
+  setConfirmation,
+  setSelectedBookmark,
+} = useBookmarkEditor(
+  bookmarkService,
+  selectedBookmark,
+  getBookmarks,
+  getTagOptions,
+  clearTagInput
+);
 
 const { toggleTheme, isDarkTheme } = useTheme(themeService);
 </script>
@@ -108,7 +115,7 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
               </template>
               <template #footer>
                 <FormButton @click="remove">Remove</FormButton>
-                <FormButton @click="confirmation = !confirmation">
+                <FormButton @click="setConfirmation(false)">
                   Cancel
                 </FormButton>
               </template>
@@ -158,11 +165,11 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
                 <FormButton @click="save">Save</FormButton>
                 <FormButton
                   v-if="selectedBookmark.id"
-                  @click="confirmation = true"
+                  @click="setConfirmation(true)"
                 >
                   Remove
                 </FormButton>
-                <FormButton @click="selectedBookmark = undefined">
+                <FormButton @click="setSelectedBookmark(undefined)">
                   Cancel
                 </FormButton>
               </template>

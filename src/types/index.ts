@@ -32,7 +32,7 @@ export interface LocalStorage {
 export enum Icon {
   Pencil = "✎",
   MagnifyingGlass = "🔎 ",
-  Star = "☼",
+  Sun = "☼",
   Moon = "☾",
   X = "✕",
   Ascending = "AZ↓",
@@ -40,4 +40,5 @@ export enum Icon {
   Favorite = "★",
   NotFavorite = "☆",
   Add = "+",
+  RightArrow = "›",
 }

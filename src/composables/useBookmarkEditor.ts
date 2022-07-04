@@ -72,6 +72,11 @@ export const useBookmarkEditor = (
       url: "",
     });
 
+  const setConfirmation = (value: boolean) => (confirmation.value = value);
+
+  const setSelectedBookmark = (bookmark?: Bookmark) =>
+    (selectedBookmark.value = bookmark);
+
   return {
     addBookmark,
     confirmation,
@@ -80,6 +85,8 @@ export const useBookmarkEditor = (
     remove,
     save,
     selectedBookmark,
+    setConfirmation,
+    setSelectedBookmark,
   };
 };
 
@@ -411,6 +418,64 @@ if (import.meta.vitest) {
         );
         await composable.save();
         expect(bookmarkService.createBookmark).toHaveBeenCalled();
+      });
+    });
+    describe("setConfirmation", () => {
+      it("sets confirmation", () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(["https"]),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const selectedBookmark = ref<Bookmark>();
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        composable.setConfirmation(true);
+        expect(composable.confirmation.value).toBe(true);
+      });
+    });
+    describe("setSelectedBookmark", () => {
+      it("sets selectedBookmark", () => {
+        const bookmarkService: BookmarkService = {
+          createBookmark: vi.fn(),
+          getAllTags: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn().mockReturnValue(["https"]),
+          removeBookmark: vi.fn(),
+          toggleFavorite: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+        const selectedBookmark = ref<Bookmark>({
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "Title",
+          url: "https://www.example.com",
+        });
+        const { composable } = withSetup(() =>
+          useBookmarkEditor(
+            bookmarkService,
+            selectedBookmark,
+            vi.fn(),
+            vi.fn(),
+            vi.fn()
+          )
+        );
+        composable.setSelectedBookmark(undefined);
+        expect(composable.selectedBookmark.value).toBeUndefined();
       });
     });
   });

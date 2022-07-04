@@ -29,7 +29,7 @@ defineEmits<{
           class="py-2 px-3 select-none"
           :class="{ 'text-stone-400': isEditing }"
         >
-          ›
+          {{ Icon.RightArrow }}
         </div>
       </template>
       <template v-else>
