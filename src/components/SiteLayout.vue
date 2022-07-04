@@ -1,8 +1,5 @@
 <script setup lang="ts">
-import { useTheme } from "../composables/useTheme";
-import { themeService } from "../services/theme";
-
-const { toggleTheme, isDarkTheme } = useTheme(themeService);
+defineProps<{ isDarkTheme: boolean }>();
 </script>
 <template>
   <div class="h-screen" :class="{ dark: isDarkTheme }">
@@ -10,7 +7,7 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
       class="h-screen flex flex-col bg-[url('/public/background.avif')] dark:bg-[url('/public/background_dark.avif')] bg-cover bg-center text-stone-700 dark:text-gray-300"
     >
       <div class="text-white flex flex-row justify-end">
-        <slot name="header" :theme="{ toggleTheme, isDarkTheme }" />
+        <slot name="header" />
       </div>
       <div class="flex flex-1 overflow-hidden">
         <div class="flex-1 flex justify-center items-center">

@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { Icon, ThemeOption } from "../types";
-defineProps<{
-  theme: {
-    toggleTheme: () => ThemeOption;
-    isDarkTheme: boolean;
-  };
-}>();
+import { Icon } from "../types";
+defineProps<{ isDarkTheme: boolean }>();
+defineEmits<{ (e: "toggle-theme"): void }>();
 </script>
 <template>
-  <button class="m-2 leading-4" @click="theme.toggleTheme">
-    {{ theme.isDarkTheme ? Icon.Star : Icon.Moon }}
+  <button class="m-2 leading-4" @click="$emit('toggle-theme')">
+    {{ isDarkTheme ? Icon.Star : Icon.Moon }}
   </button>
 </template>

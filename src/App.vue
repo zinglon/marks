@@ -21,7 +21,9 @@ import ToggleInput from "./components/ToggleInput.vue";
 import { useBookmarkEditor } from "./composables/useBookmarkEditor";
 import { useBookmarkList } from "./composables/useBookmarkList";
 import { useTag } from "./composables/useTag";
+import { useTheme } from "./composables/useTheme";
 import { bookmarkService } from "./services/bookmark";
+import { themeService } from "./services/theme";
 import { Bookmark, Icon } from "./types";
 
 const selectedBookmark = ref<Bookmark>();
@@ -55,12 +57,14 @@ const { confirmation, error, editBookmark, addBookmark, remove, save } =
     getTagOptions,
     clearTagInput
   );
+
+const { toggleTheme, isDarkTheme } = useTheme(themeService);
 </script>
 
 <template>
-  <SiteLayout>
-    <template #header="{ theme }">
-      <ThemeToggle :theme="theme" />
+  <SiteLayout :is-dark-theme="isDarkTheme">
+    <template #header>
+      <ThemeToggle :is-dark-theme="isDarkTheme" @toggle-theme="toggleTheme" />
     </template>
     <template #content>
       <CommandPalette :is-open="!!selectedBookmark">
@@ -167,6 +171,6 @@ const { confirmation, error, editBookmark, addBookmark, remove, save } =
         </template>
       </CommandPalette>
     </template>
-    <template #footer>Footer</template>
+    <template #footer></template>
   </SiteLayout>
 </template>
