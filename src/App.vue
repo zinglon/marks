@@ -57,6 +57,7 @@ const {
   save,
   setConfirmation,
   setSelectedBookmark,
+  isEditing,
 } = useBookmarkEditor(
   bookmarkService,
   selectedBookmark,
@@ -98,7 +99,7 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
                 v-for="bookmark in bookmarks"
                 :key="bookmark.id"
                 :bookmark="bookmark"
-                :is-editing="bookmark.id === selectedBookmark?.id"
+                :is-editing="isEditing(bookmark.id)"
                 @favorite-clicked="toggleFavorite"
                 @edit-clicked="editBookmark"
               />
@@ -178,6 +179,6 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
         </template>
       </CommandPalette>
     </template>
-    <template #footer></template>
+    <template #footer>Created by Ryan Mason</template>
   </SiteLayout>
 </template>

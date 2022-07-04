@@ -10,7 +10,11 @@ defineProps<{ isOpen: boolean }>();
       <div class="flex-1 flex flex-row overflow-hidden">
         <div
           class="flex-1 min-w-[60%] sm:flex flex-col overflow-hidden rounded-lg"
-          :class="{ hidden: isOpen }"
+          :class="{
+            hidden: isOpen,
+            'rounded-lg': !isOpen,
+            'rounded-l-lg rounded-r-none': isOpen,
+          }"
         >
           <slot name="content" />
         </div>

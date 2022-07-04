@@ -14,7 +14,7 @@ defineProps<{ isDarkTheme: boolean }>();
           <slot name="content" />
         </div>
       </div>
-      <div>
+      <div class="text-center text-gray-300 m-2">
         <slot name="footer" />
       </div>
     </div>

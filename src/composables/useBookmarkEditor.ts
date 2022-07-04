@@ -77,11 +77,15 @@ export const useBookmarkEditor = (
   const setSelectedBookmark = (bookmark?: Bookmark) =>
     (selectedBookmark.value = bookmark);
 
+  const isEditing = (bookmarkId: string) =>
+    bookmarkId === selectedBookmark.value?.id;
+
   return {
     addBookmark,
     confirmation,
     editBookmark,
     error,
+    isEditing,
     remove,
     save,
     selectedBookmark,

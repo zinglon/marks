@@ -10,6 +10,7 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [vue(), copyManifest()],
   test: {
+    clearMocks: true,
     environment: "happy-dom",
     includeSource: ["src/**/*.{js,ts}"],
   },
