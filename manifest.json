@@ -1,6 +1,5 @@
 {
-
-  "description": "This extension is used to display and search for bookmarks.",
+  "description": "A browser extension that allows you to view and manage your bookmarks right from your browser's start page",
   "manifest_version": 2,
   "name": "'marks",
   "version": "1.0",

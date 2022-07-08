@@ -54,3 +54,6 @@
 - [Vite](https://vitejs.dev/)
 - [Vitest](https://vitest.dev/)
 - [Vue](https://vuejs.org/)
+
+### Inspirations
+- [TailwindUI](https://tailwindui.com/)
