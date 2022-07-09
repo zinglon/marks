@@ -151,6 +151,15 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
                       : Icon.NotFavorite
                   }}
                 </ToggleInput>
+                <ToggleInput
+                  :label="'View Mode'"
+                  @toggle-clicked="
+                      selectedBookmark!.isReaderMode =
+                        !selectedBookmark!.isReaderMode
+                    "
+                >
+                  {{ selectedBookmark.isReaderMode ? Icon.Book : Icon.Web }}
+                </ToggleInput>
                 <Combobox
                   v-model="tagInput"
                   :placeholder="'Add Tag'"

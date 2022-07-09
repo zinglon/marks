@@ -37,4 +37,6 @@ export enum Icon {
   NotFavorite = "☆",
   Add = "+",
   RightArrow = "›",
+  Book = "📖",
+  Web = "🖥",
 }

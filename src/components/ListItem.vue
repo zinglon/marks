@@ -17,13 +17,13 @@ defineEmits<{
     class="flex flex-row space-x-2 p-2"
     :class="{ 'bg-stone-200 dark:bg-gray-800': isEditing }"
   >
-    <a
-      class="flex-1 overflow-hidden break-words hover:bg-stone-300 dark:hover:bg-gray-700 rounded-lg p-2"
+    <button
+      class="flex-1 overflow-hidden break-words hover:bg-stone-300 dark:hover:bg-gray-700 rounded-lg p-2 flex flex-col items-start text-left"
       @click="$emit('open-bookmark', bookmark)"
     >
       <h2>{{ props.bookmark.title }}</h2>
       <p>{{ props.bookmark.url }}</p>
-    </a>
+    </button>
     <IconButtonContainer>
       <template v-if="isEditing">
         <div

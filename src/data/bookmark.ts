@@ -34,7 +34,7 @@ export const createBookmarkDataAccessor = (
     mapApiBookmarkToBookmark(
       await bookmarkApi.create({
         title: bookmark.title,
-        url: bookmark.url,
+        url: toBrowserBookmarkUrl(bookmark.url, bookmark.isReaderMode),
       })
     );
 

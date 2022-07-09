@@ -67,6 +67,7 @@ export const useBookmarkEditor = (
     (selectedBookmark.value = {
       id: "",
       isFavorite: false,
+      isReaderMode: false,
       tags: [],
       title: "",
       url: "",
@@ -160,6 +161,7 @@ if (import.meta.vitest) {
         expect(selectedBookmark.value).toEqual({
           id: "",
           isFavorite: false,
+          isReaderMode: false,
           tags: [],
           title: "",
           url: "",
