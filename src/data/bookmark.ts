@@ -1,5 +1,19 @@
 import { Bookmark, NewBookmark } from "../types";
 
+function fromBrowserBookmarkUrl(url: string): {
+  url: string;
+  isReaderMode?: boolean;
+} {
+  const isReaderMode = url.startsWith("about:reader");
+  const baddassurl = isReaderMode
+    ? new URLSearchParams(url.substring("about:reader".length)).get("url") ?? ""
+    : url;
+  return { isReaderMode, url: baddassurl };
+}
+function toBrowserBookmarkUrl(url: string, isReaderMode?: boolean) {
+  return isReaderMode ? `about:reader?url=${encodeURIComponent(url)}` : url;
+}
+
 export const createBookmarkDataAccessor = (
   bookmarkApi: typeof browser.bookmarks
 ) => {
@@ -7,14 +21,14 @@ export const createBookmarkDataAccessor = (
     bookmark: browser.bookmarks.BookmarkTreeNode
   ) => {
     const { id, title, url } = bookmark;
-    return { id, title: title, url: url ?? "" };
+    return { id, title: title, ...fromBrowserBookmarkUrl(url ?? "") };
   };
 
   const updateBookmark = async (bookmark: Bookmark) =>
     mapApiBookmarkToBookmark(
       await bookmarkApi.update(bookmark.id, {
         title: bookmark.title,
-        url: bookmark.url,
+        url: toBrowserBookmarkUrl(bookmark.url, bookmark.isReaderMode),
       })
     );
 

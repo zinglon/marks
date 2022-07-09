@@ -4,14 +4,10 @@ export interface Bookmark {
   url: string;
   isFavorite?: boolean;
   tags?: string[];
+  isReaderMode?: boolean;
 }
 
-export interface NewBookmark {
-  title: string;
-  url: string;
-  isFavorite?: boolean;
-  tags?: string[];
-}
+export type NewBookmark = Omit<Bookmark, "id">;
 
 export enum ThemeOption {
   Light = "light",

@@ -9,6 +9,13 @@ defineEmits<{
   (e: "favorite-clicked", value: string): void;
   (e: "edit-clicked", value: string): void;
 }>();
+
+function openBookmark(bookmark: Bookmark) {
+  browser.tabs.create({
+    openInReaderMode: bookmark.isReaderMode,
+    url: bookmark.url,
+  });
+}
 </script>
 
 <template>
@@ -18,7 +25,7 @@ defineEmits<{
   >
     <a
       class="flex-1 overflow-hidden break-words hover:bg-stone-300 dark:hover:bg-gray-700 rounded-lg p-2"
-      :href="props.bookmark.url"
+      @click="openBookmark(props.bookmark)"
     >
       <h2>{{ props.bookmark.title }}</h2>
       <p>{{ props.bookmark.url }}</p>
