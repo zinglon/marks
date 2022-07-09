@@ -20,6 +20,7 @@
 ### Prerequisites
 - Install [VS Code](https://code.visualstudio.com/download)
   - Install [Vue Language Features extension](https://marketplace.visualstudio.com/items?itemName=Vue.volar)
+    - Follow [instructions](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669=) for disabling VSCode's Typescript and Javascript Language Features for this workspace.
   - Install [ESLint extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
   - Install [Tailwind CSS IntelliSense extension](https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss)
 
