@@ -59,7 +59,6 @@ export const createBookmarkDataAccessor = (
     "http://",
     "ftp://",
     "file://",
-    "asdf://",
   ];
   return {
     createBookmark,
