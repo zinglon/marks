@@ -30,16 +30,15 @@ export const useBookmarkList = (bookmarkService: BookmarkService) => {
     bookmarkService.toggleFavorite(bookmarkId);
     await getBookmarks();
   };
-  const go = () => {
-    if (bookmarks.value.length && bookmarks.value[0].url)
-      window.location.href = bookmarks.value[0].url;
-  };
+  const openBookmark = async (bookmark: Bookmark) =>
+    await bookmarkService.openBookmark(bookmark);
+
   return {
     bookmarks,
     getBookmarks,
-    go,
     isFiltering,
     isSorting,
+    openBookmark,
     searchString,
     toggleFavorite,
     toggleFilter,
@@ -58,6 +57,7 @@ if (import.meta.vitest) {
         getBookmark: vi.fn(),
         getBookmarks: getBookmarks,
         getSupportedProtocols: vi.fn(),
+        openBookmark: vi.fn(),
         removeBookmark: vi.fn(),
         toggleFavorite: vi.fn(),
         updateBookmark: vi.fn(),
@@ -73,6 +73,7 @@ if (import.meta.vitest) {
         getBookmark: vi.fn(),
         getBookmarks: getBookmarks,
         getSupportedProtocols: vi.fn(),
+        openBookmark: vi.fn(),
         removeBookmark: vi.fn(),
         toggleFavorite: vi.fn(),
         updateBookmark: vi.fn(),
@@ -103,6 +104,7 @@ if (import.meta.vitest) {
           getBookmark: vi.fn(),
           getBookmarks: getBookmarks,
           getSupportedProtocols: vi.fn(),
+          openBookmark: vi.fn(),
           removeBookmark: vi.fn(),
           toggleFavorite: vi.fn(),
           updateBookmark: vi.fn(),
@@ -120,48 +122,6 @@ if (import.meta.vitest) {
 
         expect(getBookmarks).toHaveBeenCalledWith("test", true, true);
         expect(composable.bookmarks.value).toEqual(bookmarks);
-      });
-    });
-    describe("go", () => {
-      it("navigates to the url of the first bookmark in the list", async () => {
-        const bookmarks = [
-          {
-            id: "1",
-            isFavorite: false,
-            tags: ["test"],
-            title: "test",
-            url: "https://example.com",
-          },
-        ];
-        const getBookmarks = vi.fn().mockReturnValue(bookmarks);
-        const bookmarkService: BookmarkService = {
-          createBookmark: vi.fn(),
-          getAllTags: vi.fn(),
-          getBookmark: vi.fn(),
-          getBookmarks: getBookmarks,
-          getSupportedProtocols: vi.fn(),
-          removeBookmark: vi.fn(),
-          toggleFavorite: vi.fn(),
-          updateBookmark: vi.fn(),
-        };
-        const { composable } = withSetup(() =>
-          useBookmarkList(bookmarkService)
-        );
-
-        composable.searchString.value = "test";
-        composable.isSorting.value = true;
-        composable.isFiltering.value = true;
-
-        // yeehaw 🤠
-        // eslint-disable-next-line
-        // @ts-ignore
-        delete window.location;
-        window.location = { href: "" } as Location;
-        await nextTick();
-
-        composable.go();
-
-        expect(window.location.href).toEqual(bookmarks[0].url);
       });
     });
     describe("toggleFavorite", () => {
@@ -183,6 +143,7 @@ if (import.meta.vitest) {
           getBookmark: vi.fn(),
           getBookmarks: getBookmarks,
           getSupportedProtocols: vi.fn(),
+          openBookmark: vi.fn(),
           removeBookmark: vi.fn(),
           toggleFavorite: toggleFavorite,
           updateBookmark: vi.fn(),
@@ -205,6 +166,7 @@ if (import.meta.vitest) {
           getBookmark: vi.fn(),
           getBookmarks: vi.fn(),
           getSupportedProtocols: vi.fn(),
+          openBookmark: vi.fn(),
           removeBookmark: vi.fn(),
           toggleFavorite: vi.fn(),
           updateBookmark: vi.fn(),
@@ -225,6 +187,7 @@ if (import.meta.vitest) {
           getBookmark: vi.fn(),
           getBookmarks: vi.fn(),
           getSupportedProtocols: vi.fn(),
+          openBookmark: vi.fn(),
           removeBookmark: vi.fn(),
           toggleFavorite: vi.fn(),
           updateBookmark: vi.fn(),

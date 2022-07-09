@@ -31,9 +31,9 @@ const useBookmarkList = (
 ) => ({
   bookmarks: options?.bookmarks ?? ref([]),
   getBookmarks: options?.getBookmarks ?? vi.fn().mockReturnValue([]),
-  go: options?.go ?? vi.fn(),
   isFiltering: options?.isFiltering ?? ref(false),
   isSorting: options?.isSorting ?? ref(false),
+  openBookmark: options?.openBookmark ?? vi.fn(),
   searchString: options?.searchString ?? ref(""),
   toggleFavorite: options?.toggleFavorite ?? vi.fn(),
   toggleFilter: options?.toggleFilter ?? vi.fn(),
@@ -169,19 +169,27 @@ describe("App", () => {
       await fireEvent.update(input, "test2");
       expect(input.value).toBe("test2");
     });
-    it("calls go when enter is pressed", async () => {
-      const go = vi.fn();
+    it("calls openBookmark when enter is pressed", async () => {
+      const bookmark = fake.bookmark();
+      const openBookmark = vi.fn();
       const fakeBookmarkList = fake.useBookmarkList({
-        go,
+        bookmarks: ref([bookmark]),
+        openBookmark,
       });
       vi.spyOn(bookmarkList, "useBookmarkList").mockReturnValue(
         fakeBookmarkList
+      );
+      const fakeBookmarkEditor = fake.useBookmarkEditor({
+        isEditing: vi.fn().mockReturnValue(false),
+      });
+      vi.spyOn(bookmarkEditor, "useBookmarkEditor").mockReturnValue(
+        fakeBookmarkEditor
       );
       const app = render(App);
       const input = app.container.querySelector("input");
       assertIsDefined(input);
       await fireEvent(input, new KeyboardEvent("keydown", { key: "Enter" }));
-      expect(go).toHaveBeenCalled();
+      expect(openBookmark).toHaveBeenCalled();
     });
   });
   describe("SortButton", () => {

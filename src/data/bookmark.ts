@@ -1,22 +1,20 @@
 import { Bookmark, NewBookmark } from "../types";
 
-function fromBrowserBookmarkUrl(url: string): {
-  url: string;
-  isReaderMode?: boolean;
-} {
-  const isReaderMode = url.startsWith("about:reader");
-  const baddassurl = isReaderMode
-    ? new URLSearchParams(url.substring("about:reader".length)).get("url") ?? ""
-    : url;
-  return { isReaderMode, url: baddassurl };
-}
-function toBrowserBookmarkUrl(url: string, isReaderMode?: boolean) {
-  return isReaderMode ? `about:reader?url=${encodeURIComponent(url)}` : url;
-}
-
 export const createBookmarkDataAccessor = (
   bookmarkApi: typeof browser.bookmarks
 ) => {
+  const fromBrowserBookmarkUrl = (url: string) => {
+    const isReaderMode = url.startsWith("about:reader");
+    const baddassurl = isReaderMode
+      ? new URLSearchParams(url.substring("about:reader".length)).get("url") ??
+        ""
+      : url;
+    return { isReaderMode, url: baddassurl };
+  };
+
+  const toBrowserBookmarkUrl = (url: string, isReaderMode?: boolean) =>
+    isReaderMode ? `about:reader?url=${encodeURIComponent(url)}` : url;
+
   const mapApiBookmarkToBookmark = (
     bookmark: browser.bookmarks.BookmarkTreeNode
   ) => {

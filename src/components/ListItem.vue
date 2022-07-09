@@ -8,14 +8,8 @@ const props = defineProps<{ bookmark: Bookmark; isEditing: boolean }>();
 defineEmits<{
   (e: "favorite-clicked", value: string): void;
   (e: "edit-clicked", value: string): void;
+  (e: "open-bookmark", value: Bookmark): void;
 }>();
-
-function openBookmark(bookmark: Bookmark) {
-  browser.tabs.create({
-    openInReaderMode: bookmark.isReaderMode,
-    url: bookmark.url,
-  });
-}
 </script>
 
 <template>
@@ -25,7 +19,7 @@ function openBookmark(bookmark: Bookmark) {
   >
     <a
       class="flex-1 overflow-hidden break-words hover:bg-stone-300 dark:hover:bg-gray-700 rounded-lg p-2"
-      @click="openBookmark(props.bookmark)"
+      @click="$emit('open-bookmark', bookmark)"
     >
       <h2>{{ props.bookmark.title }}</h2>
       <p>{{ props.bookmark.url }}</p>

@@ -3,11 +3,13 @@ import { FavoriteService, favoriteService } from "../services/favorite";
 import { TagService, tagService } from "../services/tag";
 import { Bookmark, NewBookmark } from "../types";
 import { byProperty } from "../utils/compare";
+import { TabService, tabService } from "./tab";
 
 export const createBookmarkService = (
   bookmarkData: BookmarkData,
   tagService: TagService,
-  favoriteService: FavoriteService
+  favoriteService: FavoriteService,
+  tabService: TabService
 ) => {
   const getSearchItems = (bookmark: Bookmark) =>
     [bookmark.title, bookmark.url, ...(bookmark.tags ?? [])].map((item) =>
@@ -89,12 +91,16 @@ export const createBookmarkService = (
 
   const getSupportedProtocols = () => bookmarkData.getSupportedProtocols();
 
+  const openBookmark = async (bookmark: Bookmark) =>
+    await tabService.openTab(bookmark.url, bookmark.isReaderMode);
+
   return {
     createBookmark,
     getAllTags: tagService.getAllTags,
     getBookmark,
     getBookmarks,
     getSupportedProtocols,
+    openBookmark,
     removeBookmark,
     toggleFavorite: favoriteService.toggleFavorite,
     updateBookmark,
@@ -104,7 +110,8 @@ export const createBookmarkService = (
 export const bookmarkService = createBookmarkService(
   bookmarkData,
   tagService,
-  favoriteService
+  favoriteService,
+  tabService
 );
 export type BookmarkService = typeof bookmarkService;
 
@@ -144,7 +151,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.createBookmark(bookmark);
@@ -195,7 +203,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmark(bookmark.id);
@@ -236,7 +245,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmarks("exa");
@@ -275,7 +285,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmarks("ta");
@@ -314,7 +325,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmarks("tit");
@@ -360,7 +372,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmarks(undefined, true);
@@ -399,7 +412,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = await bookmarkService.getBookmarks(
@@ -438,11 +452,57 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         const result = bookmarkService.getSupportedProtocols();
         expect(result).toEqual(supportProtocols);
+      });
+    });
+    describe("openBookmark", () => {
+      it("calls openTab", async () => {
+        const tagService = {
+          getAllTags: vi.fn(),
+          getTagsForBookmark: vi.fn(),
+          setTags: vi.fn(),
+        };
+        const favoriteService = {
+          addFavorite: vi.fn(),
+          isFavorite: vi.fn(),
+          removeFavorite: vi.fn(),
+          toggleFavorite: vi.fn(),
+        };
+
+        const bookmarkData = {
+          createBookmark: vi.fn(),
+          getBookmark: vi.fn(),
+          getBookmarks: vi.fn(),
+          getSupportedProtocols: vi.fn(),
+          removeBookmark: vi.fn(),
+          updateBookmark: vi.fn(),
+        };
+
+        const openTab = vi.fn();
+        const tabService = {
+          openTab: openTab,
+        };
+
+        const bookmarkService = createBookmarkService(
+          bookmarkData,
+          tagService,
+          favoriteService,
+          tabService
+        );
+
+        await bookmarkService.openBookmark({
+          id: "1",
+          isFavorite: false,
+          tags: [],
+          title: "A",
+          url: "https://example.com",
+        });
+        expect(openTab).toHaveBeenCalled();
       });
     });
     describe("removeBookmark", () => {
@@ -479,7 +539,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         await bookmarkService.removeBookmark(bookmark.id);
@@ -524,7 +585,8 @@ if (import.meta.vitest) {
         const bookmarkService = createBookmarkService(
           bookmarkData,
           tagService,
-          favoriteService
+          favoriteService,
+          tabService
         );
 
         await bookmarkService.updateBookmark(bookmark);

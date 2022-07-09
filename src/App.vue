@@ -36,7 +36,7 @@ const {
   toggleSort,
   toggleFilter,
   toggleFavorite,
-  go,
+  openBookmark,
 } = useBookmarkList(bookmarkService);
 
 const {
@@ -81,7 +81,11 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
             <SearchInput
               v-model="searchString"
               :placeholder="`${Icon.MagnifyingGlass} Search Bookmarks`"
-              @go="go"
+              @go="
+                bookmarks.length && bookmarks[0].url
+                  ? openBookmark(bookmarks[0])
+                  : undefined
+              "
             />
             <IconButtonContainer>
               <IconButton @click="toggleSort">
@@ -102,6 +106,7 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
                 :is-editing="isEditing(bookmark.id)"
                 @favorite-clicked="toggleFavorite"
                 @edit-clicked="editBookmark"
+                @open-bookmark="openBookmark"
               />
             </template>
             <template #fallback>No bookmarks found</template>
