@@ -1,3 +1,7 @@
+![status](https://github.com/xryanmason/marks/actions/workflows/ci.yml/badge.svg)
+
+---
+
 # 'marks
 **A browser extension that allows you to view and manage your bookmarks right from your browser's start page**
 
