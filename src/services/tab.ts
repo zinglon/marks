@@ -13,6 +13,7 @@ export type TabService = typeof tabService;
 
 if (import.meta.vitest) {
   const { describe, expect, it, vi } = import.meta.vitest;
+  vi.mock("webextension-polyfill", vi.fn());
   describe("createTabService", () => {
     describe("openTab", () => {
       it("creates a tab and closes the current", async () => {

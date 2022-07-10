@@ -47,6 +47,11 @@ const useBookmarkEditor = (
   confirmation: options?.confirmation ?? ref(false),
   editBookmark: options?.editBookmark ?? vi.fn(),
   error: options?.error ?? ref(""),
+  features:
+    options?.features ??
+    ref({
+      hasReaderMode: false,
+    }),
   isEditing: options?.isEditing ?? vi.fn().mockReturnValue(false),
   remove: options?.remove ?? vi.fn(),
   save: options?.save ?? vi.fn(),

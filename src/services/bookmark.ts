@@ -115,6 +115,7 @@ export type BookmarkService = typeof bookmarkService;
 
 if (import.meta.vitest) {
   const { describe, expect, it, vi } = import.meta.vitest;
+  vi.mock("webextension-polyfill", vi.fn());
   describe("createBookmarkService", () => {
     describe("createBookmark", () => {
       it("creates a bookmark for the provided bookmark data and returns the result", async () => {

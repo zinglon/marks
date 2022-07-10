@@ -22,9 +22,9 @@ import { useBookmarkList } from "./composables/useBookmarkList";
 import { useTag } from "./composables/useTag";
 import { useTheme } from "./composables/useTheme";
 import { bookmarkService } from "./services/bookmark";
+import { platformService } from "./services/platform";
 import { themeService } from "./services/theme";
 import { Icon } from "./types";
-
 const { selectedBookmark } = useApp();
 
 const {
@@ -58,7 +58,9 @@ const {
   setConfirmation,
   setSelectedBookmark,
   isEditing,
+  features,
 } = useBookmarkEditor(
+  platformService,
   bookmarkService,
   selectedBookmark,
   getBookmarks,
@@ -152,6 +154,7 @@ const { toggleTheme, isDarkTheme } = useTheme(themeService);
                   }}
                 </ToggleInput>
                 <ToggleInput
+                  v-if="features.hasReaderMode"
                   :label="'View Mode'"
                   @toggle-clicked="
                       selectedBookmark!.isReaderMode =

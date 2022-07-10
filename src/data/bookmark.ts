@@ -1,3 +1,5 @@
+import * as browser from "webextension-polyfill";
+
 import { Bookmark, NewBookmark } from "../types";
 
 export const createBookmarkDataAccessor = (
@@ -16,7 +18,7 @@ export const createBookmarkDataAccessor = (
     isReaderMode ? `about:reader?url=${encodeURIComponent(url)}` : url;
 
   const mapApiBookmarkToBookmark = (
-    bookmark: browser.bookmarks.BookmarkTreeNode
+    bookmark: browser.Bookmarks.BookmarkTreeNode
   ) => {
     const { id, title, url } = bookmark;
     return { id, title: title, ...fromBrowserBookmarkUrl(url ?? "") };
@@ -43,9 +45,11 @@ export const createBookmarkDataAccessor = (
   const getBookmark = async (bookmarkId: string) =>
     mapApiBookmarkToBookmark((await bookmarkApi.get(bookmarkId))[0]);
 
-  // Bookmarks api returns folders so we need to filter them out
-  const isBookmark = (bookmark: browser.bookmarks.BookmarkTreeNode) =>
-    bookmark.type === "bookmark";
+  // Bookmarks api returns non-bookmarks so we need to filter them out
+  const isBookmark = (bookmark: browser.Bookmarks.BookmarkTreeNode) =>
+    bookmark.url &&
+    !(bookmark?.type === "folder") &&
+    !(bookmark?.type === "separator");
 
   const getBookmarks = async () =>
     (await bookmarkApi.search({}))

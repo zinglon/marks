@@ -1,11 +1,13 @@
 import { nextTick, onMounted, Ref, ref, watch } from "vue";
 
 import { BookmarkService } from "../services/bookmark";
+import { PlatformService } from "../services/platform";
 import { Bookmark } from "../types";
 import { assertIsDefined } from "../utils/assertIsDefined";
 import { withSetup } from "../utils/testHelpers";
 
 export const useBookmarkEditor = (
+  platformService: PlatformService,
   bookmarkService: BookmarkService,
   selectedBookmark: Ref<Bookmark | undefined>,
   getBookmarks: () => Promise<Bookmark[]>,
@@ -81,11 +83,20 @@ export const useBookmarkEditor = (
   const isEditing = (bookmarkId: string) =>
     bookmarkId === selectedBookmark.value?.id;
 
+  const features = ref({
+    hasReaderMode: false,
+  });
+
+  onMounted(async () => {
+    features.value = await platformService.getFeatures();
+  });
+
   return {
     addBookmark,
     confirmation,
     editBookmark,
     error,
+    features,
     isEditing,
     remove,
     save,
@@ -99,6 +110,9 @@ if (import.meta.vitest) {
   const { describe, expect, it, vi } = import.meta.vitest;
   describe("useBookmarkEditor", () => {
     it("clears error if selectedBookmark changes", async () => {
+      const platformService: PlatformService = {
+        getFeatures: vi.fn(),
+      };
       const bookmarkService: BookmarkService = {
         createBookmark: vi.fn(),
         getAllTags: vi.fn(),
@@ -120,6 +134,7 @@ if (import.meta.vitest) {
       });
       const { composable } = withSetup(() =>
         useBookmarkEditor(
+          platformService,
           bookmarkService,
           selectedBookmark,
           vi.fn(),
@@ -135,6 +150,9 @@ if (import.meta.vitest) {
     });
     describe("addBookmark", () => {
       it("populates selectedBookmark", () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -150,6 +168,7 @@ if (import.meta.vitest) {
         const selectedBookmark = ref<Bookmark>();
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -170,6 +189,9 @@ if (import.meta.vitest) {
     });
     describe("editBookmark", () => {
       it("unsets selectedBookmark if it is set", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -191,6 +213,7 @@ if (import.meta.vitest) {
         });
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -203,6 +226,9 @@ if (import.meta.vitest) {
         expect(selectedBookmark.value).toBeUndefined();
       });
       it("sets the selectedBookmark if it is not currently set", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmark = {
           id: "1",
           isFavorite: false,
@@ -226,6 +252,7 @@ if (import.meta.vitest) {
         const selectedBookmark = ref<Bookmark>();
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -238,6 +265,9 @@ if (import.meta.vitest) {
         expect(selectedBookmark.value).toEqual(bookmark);
       });
       it("calls clearTagInput", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -254,6 +284,7 @@ if (import.meta.vitest) {
         const clearTagInput = vi.fn();
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -266,6 +297,9 @@ if (import.meta.vitest) {
         expect(clearTagInput).toHaveBeenCalled();
       });
       it("calls getTagOptions", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -282,6 +316,7 @@ if (import.meta.vitest) {
         const getTagOptions = vi.fn();
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -296,6 +331,9 @@ if (import.meta.vitest) {
     });
     describe("remove", () => {
       it("calls remove bookmark, resets selectedBookmark, resets confirmation, and gets latest bookmarks", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -319,6 +357,7 @@ if (import.meta.vitest) {
         selectedBookmark.value = bookmark;
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             getBookmarks,
@@ -337,6 +376,9 @@ if (import.meta.vitest) {
     });
     describe("save", () => {
       it("sets error if the bookmark fails validation", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -359,6 +401,7 @@ if (import.meta.vitest) {
         selectedBookmark.value = bookmark;
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -370,6 +413,9 @@ if (import.meta.vitest) {
         expect(composable.error.value).toBeDefined();
       });
       it("calls update bookmark if the bookmark already exists", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -392,6 +438,7 @@ if (import.meta.vitest) {
         selectedBookmark.value = bookmark;
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -403,6 +450,9 @@ if (import.meta.vitest) {
         expect(bookmarkService.updateBookmark).toHaveBeenCalled();
       });
       it("calls create bookmark if it is a new bookmark", async () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -425,6 +475,7 @@ if (import.meta.vitest) {
         selectedBookmark.value = bookmark;
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -438,6 +489,9 @@ if (import.meta.vitest) {
     });
     describe("setConfirmation", () => {
       it("sets confirmation", () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -452,6 +506,7 @@ if (import.meta.vitest) {
         const selectedBookmark = ref<Bookmark>();
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),
@@ -465,6 +520,9 @@ if (import.meta.vitest) {
     });
     describe("setSelectedBookmark", () => {
       it("sets selectedBookmark", () => {
+        const platformService: PlatformService = {
+          getFeatures: vi.fn(),
+        };
         const bookmarkService: BookmarkService = {
           createBookmark: vi.fn(),
           getAllTags: vi.fn(),
@@ -485,6 +543,7 @@ if (import.meta.vitest) {
         });
         const { composable } = withSetup(() =>
           useBookmarkEditor(
+            platformService,
             bookmarkService,
             selectedBookmark,
             vi.fn(),

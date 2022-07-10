@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => ({
   test: {
     clearMocks: true,
     environment: "happy-dom",
+    globals: true,
     includeSource: ["src/**/*.{js,ts}"],
   },
 }));
