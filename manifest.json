@@ -2,7 +2,7 @@
   "description": "A browser extension that allows you to view and manage your bookmarks right from your browser's start page",
   "manifest_version": 2,
   "name": "'marks",
-  "version": "1.0",
+  "version": "0.0.1-alpha",
   "permissions": ["bookmarks"],
   "chrome_url_overrides": {
 		"newtab": "index.html"
