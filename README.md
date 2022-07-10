@@ -41,13 +41,22 @@
   - Data
     - Used by services to access data from the Web Extensions API and localStorage
 ### Running the Extension
-1. Run `npm install`
-1. Run `npm run dev`
-1. Open Firefox and go to `about:debugging`
-1. Select **This Firefox**
-1. Select **Load Temporary Add-on...**
-1. Select the **manifest.json** file in the dist directory and select **Open**
-1. Open a new tab and you will see 'marks
+- #### Firefox
+  1. Run `npm install`
+  1. Run `npm run dev`
+  1. Open Firefox and go to `about:debugging`
+  1. Select **This Firefox**
+  1. Select **Load Temporary Add-on...**
+  1. Select the **manifest.json** file in the dist directory and select **Open**
+  1. Open a new tab and you will see 'marks
+- #### Chrome
+  1. Run `npm install`
+  1. Run `npm run dev`
+  1. Open Chrome and go to `chrome://extensions/`
+  1. Toggle **Developer mode** on
+  1. Select **Load unpacked**
+  1. Select the dist directory and select **Open**
+  1. Open a new tab and you will see 'marks
 
 ### Resources
 - [MDN WebExtensions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions)
