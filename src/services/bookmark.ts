@@ -1,8 +1,9 @@
+import _ from "lodash";
+
 import { BookmarkData, bookmarkData } from "../data/bookmark";
 import { FavoriteService, favoriteService } from "../services/favorite";
 import { TagService, tagService } from "../services/tag";
 import { Bookmark, NewBookmark } from "../types";
-import { byProperty } from "../utils/compare";
 import { TabService, tabService } from "./tab";
 
 export const createBookmarkService = (
@@ -31,7 +32,11 @@ export const createBookmarkService = (
     );
 
   const applySort = (bookmarks: Bookmark[], isSorting: boolean) =>
-    [...bookmarks].sort(byProperty("title", isSorting));
+    _.orderBy(
+      bookmarks,
+      ["isFavorite", (b) => b.title.toLowerCase()],
+      ["desc", isSorting ? "desc" : "asc"]
+    );
 
   const getBookmarks = async (
     search?: string,
